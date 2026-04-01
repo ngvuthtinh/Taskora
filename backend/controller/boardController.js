@@ -1,4 +1,6 @@
 const Board = require('../models/boardModel')
+const Column = require('../models/columnModel')
+const Card = require('../models/cardModel')
 
 const createNewBoard = async (req, res) => {
     try {
@@ -41,4 +43,25 @@ const getBoardDetails = async (req, res) => {
     }
 }
 
-module.exports = { createNewBoard, getBoardDetails }
+const moveCardToDifferentColumn = async (req, res) => {
+    try {
+        const { cardId, prevColumnId, prevCardOrderIds, nextColumnId, nextCardOrderIds } = req.body
+
+        const updatePrevColumn = Column.findByIdAndUpdate(prevColumnId, { cardOrderIds: prevCardOrderIds }, { returnDocument: 'after' })
+
+        const updateNextColumn = Column.findByIdAndUpdate(nextColumnId, { cardOrderIds: nextCardOrderIds }, { returnDocument: 'after' })
+
+        const updateCard = Card.findByIdAndUpdate(cardId, { columnId: nextColumnId }, { returnDocument: 'after' })
+
+        await Promise.all([
+            updatePrevColumn,
+            updateNextColumn,
+            updateCard
+        ]);
+        res.status(200).json({ message: 'Chuyển cột thành công!'});
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi server khi chuyển cột', error: error.message });
+    }
+}
+
+module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn }

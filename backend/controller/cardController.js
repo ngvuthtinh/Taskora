@@ -1,6 +1,7 @@
 const Card = require('../models/cardModel')
 const Column = require('../models/columnModel')
 
+
 const createNewCard = async (req, res) => {
     try {
         const { boardId, columnId, title, description } = req.body
@@ -24,4 +25,26 @@ const createNewCard = async (req, res) => {
     }
 }
 
-module.exports = {createNewCard}
+const updateCard = async (req, res) => {
+    try {
+        const { title, description } = req.body
+
+        const card = await Card.findByIdAndUpdate(
+            req.params.id,
+            { title, description },
+            { returnDocument: 'after' }
+        )
+
+        if (!card) {
+            return res.status(404).json({ error: 'No such Card' })
+        }
+
+        res.status(200).json({ message: 'Update Card thành công!', card: card })
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi server khi update Card', error: error.message })
+    }
+}
+
+
+
+module.exports = { createNewCard, updateCard }
