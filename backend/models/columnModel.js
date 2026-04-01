@@ -12,7 +12,11 @@ const columnSchema = new Schema ({
         type: String,
         required: true
     },
-    cardOrderIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Card', default: [] }]
+    cardOrderIds: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Card', 
+        default: [] 
+    }]
 }, {timestamps: true})
 
 module.exports = mongoose.model('Column', columnSchema)

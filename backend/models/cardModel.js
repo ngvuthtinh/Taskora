@@ -4,17 +4,26 @@ const cardSchema = new mongoose.Schema({
   boardId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Board', 
-    required: true },
+    required: true 
+  },
   columnId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Column', 
-    required: true },
+    required: true 
+  },
   title: { 
     type: String, 
-    required: true },
+    required: true 
+  },
   description: { 
     type: String, 
-    default: null },
+    default: null 
+  },
+  memberIds: [{
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    default: []
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Card', cardSchema)

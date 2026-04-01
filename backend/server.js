@@ -6,6 +6,8 @@ const authRoutes = require('./routes/authRoutes')
 const boardRoutes = require('./routes/boardRoutes')
 const columnRoutes = require('./routes/columnRoutes')
 const cardRoutes = require('./routes/cardRoutes')
+const { errorHandler } = require('./middlewares/errorMiddleware')
+
 
 const app = express();
 
@@ -25,6 +27,7 @@ app.use('/api/boards', boardRoutes)
 app.use('/api/columns', columnRoutes)
 app.use('/api/cards', cardRoutes)
 
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => {

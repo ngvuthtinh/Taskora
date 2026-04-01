@@ -3,18 +3,23 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
 
+        if (!name || !email || !password) {
+            res.status(400)
+            throw new Error('Name, email and password are required!')
+        }
+
         const user = await User.findOne({ email });
         if (user) {
-            return res.status(400).json({ message: 'User already exists' });
+            res.status(400)
+            throw new Error('User already exists!')
         }
 
         const salt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(password, salt)
-
 
         const newUser = await User.create({
             name,
@@ -32,22 +37,29 @@ const register = async (req, res) => {
         })
 
     } catch (error) {
-        res.status(500).json({ message: 'Server Error', error: error.message })
+        next(error)
     }
 }
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password) {
+            res.status(400)
+            throw new Error('Email and password are required!')
+        }
+
         const user = await User.findOne({ email })
         if (!user) {
-            return res.status(404).json({ message: 'Email is not exist' })
+            res.status(404)
+            throw new Error('Email does not exist!')
         }
 
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
-            return res.status(400).json({ message: 'Password is not correct ' })
+            res.status(400)
+            throw new Error('Incorrect password!')
         }
 
         const token = jwt.sign(
@@ -67,7 +79,7 @@ const login = async (req, res) => {
         })
 
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        next(error)
     }
 }
 

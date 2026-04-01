@@ -1,14 +1,16 @@
 const Column = require('../models/columnModel')
 const Board = require('../models/boardModel')
 
-const createNewColumn = async (req, res) => {
+const createNewColumn = async (req, res, next) => {
     try {
         const { boardId, title } = req.body
 
-        const newColumn = await Column.create({
-            boardId,
-            title
-        })
+        if (!boardId || !title) {
+            res.status(400)
+            throw new Error('Board ID and column title are required!')
+        }
+
+        const newColumn = await Column.create({ boardId, title })
 
         await Board.findByIdAndUpdate(
             boardId,
@@ -16,16 +18,15 @@ const createNewColumn = async (req, res) => {
             { returnDocument: 'after' }
         )
 
-        res.status(201).json({ message: 'Tạo Cột thành công!', column: newColumn });
+        res.status(201).json({ message: 'Column created successfully!', column: newColumn })
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server khi tạo Column', error: error.message });
+        next(error)
     }
 }
 
-const updateColumn = async (req, res) => {
+const updateColumn = async (req, res, next) => {
     try {
-        const columnId = req.params.id;
-
+        const columnId = req.params.id
         const { cardOrderIds, title } = req.body
 
         const updateData = {}
@@ -44,12 +45,13 @@ const updateColumn = async (req, res) => {
         )
 
         if (!updatedColumn) {
-            return res.status(404).json({ message: 'Không tìm thấy Cột này!' });
+            res.status(404)
+            throw new Error('Column not found!')
         }
 
-        res.status(200).json({ message: 'Cập nhật Cột thành công!', column: updatedColumn });
+        res.status(200).json({ message: 'Column updated successfully!', column: updatedColumn })
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server khi cập nhật Cột', error: error.message });
+        next(error)
     }
 }
 

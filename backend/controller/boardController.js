@@ -2,9 +2,14 @@ const Board = require('../models/boardModel')
 const Column = require('../models/columnModel')
 const Card = require('../models/cardModel')
 
-const createNewBoard = async (req, res) => {
+const createNewBoard = async (req, res, next) => {
     try {
-        const { title, description, type } = req.body;
+        const { title, description, type } = req.body
+
+        if (!title) {
+            res.status(400)
+            throw new Error('Board title is required!')
+        }
 
         const ownerId = req.user._id
 
@@ -18,11 +23,11 @@ const createNewBoard = async (req, res) => {
         res.status(201).json(newBoard)
 
     } catch (error) {
-        res.status(500).json({ message: 'Server error when creating a board.', error: error.message })
+        next(error)
     }
 }
 
-const getBoardDetails = async (req, res) => {
+const getBoardDetails = async (req, res, next) => {
     try {
         const boardId = req.params.id
 
@@ -34,33 +39,29 @@ const getBoardDetails = async (req, res) => {
         })
 
         if (!board) {
-            return res.status(404).json({ message: 'Không tìm thấy Board này!' });
+            res.status(404)
+            throw new Error('Board not found!')
         }
 
-        res.status(200).json({ board });
+        res.status(200).json({ board })
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server khi lấy chi tiết Board', error: error.message });
+        next(error)
     }
 }
 
-const moveCardToDifferentColumn = async (req, res) => {
+const moveCardToDifferentColumn = async (req, res, next) => {
     try {
         const { cardId, prevColumnId, prevCardOrderIds, nextColumnId, nextCardOrderIds } = req.body
 
         const updatePrevColumn = Column.findByIdAndUpdate(prevColumnId, { cardOrderIds: prevCardOrderIds }, { returnDocument: 'after' })
-
         const updateNextColumn = Column.findByIdAndUpdate(nextColumnId, { cardOrderIds: nextCardOrderIds }, { returnDocument: 'after' })
-
         const updateCard = Card.findByIdAndUpdate(cardId, { columnId: nextColumnId }, { returnDocument: 'after' })
 
-        await Promise.all([
-            updatePrevColumn,
-            updateNextColumn,
-            updateCard
-        ]);
-        res.status(200).json({ message: 'Chuyển cột thành công!'});
+        await Promise.all([updatePrevColumn, updateNextColumn, updateCard])
+
+        res.status(200).json({ message: 'Card moved successfully!' })
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server khi chuyển cột', error: error.message });
+        next(error)
     }
 }
 

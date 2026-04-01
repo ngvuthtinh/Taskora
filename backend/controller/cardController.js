@@ -1,17 +1,16 @@
 const Card = require('../models/cardModel')
 const Column = require('../models/columnModel')
 
-
-const createNewCard = async (req, res) => {
+const createNewCard = async (req, res, next) => {
     try {
         const { boardId, columnId, title, description } = req.body
 
-        const newCard = await Card.create({
-            boardId,
-            columnId,
-            title,
-            description
-        })
+        if (!boardId || !columnId || !title) {
+            res.status(400)
+            throw new Error('Board ID, column ID and card title are required!')
+        }
+
+        const newCard = await Card.create({ boardId, columnId, title, description })
 
         await Column.findByIdAndUpdate(
             columnId,
@@ -19,13 +18,13 @@ const createNewCard = async (req, res) => {
             { returnDocument: 'after' }
         )
 
-        res.status(201).json({ message: 'Tạo Card thành công!', card: newCard });
+        res.status(201).json({ message: 'Card created successfully!', card: newCard })
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server khi tạo Card', error: error.message });
+        next(error)
     }
 }
 
-const updateCard = async (req, res) => {
+const updateCard = async (req, res, next) => {
     try {
         const { title, description } = req.body
 
@@ -36,15 +35,43 @@ const updateCard = async (req, res) => {
         )
 
         if (!card) {
-            return res.status(404).json({ error: 'No such Card' })
+            res.status(404)
+            throw new Error('Card not found!')
         }
 
-        res.status(200).json({ message: 'Update Card thành công!', card: card })
+        res.status(200).json({ message: 'Card updated successfully!', card: card })
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server khi update Card', error: error.message })
+        next(error)
     }
 }
 
+const assignMemberToCard = async (req, res, next) => {
+    try {
+        const cardId = req.params.id
+        const { userId, action } = req.body
 
+        let updateData = {}
 
-module.exports = { createNewCard, updateCard }
+        if (action === 'add') {
+            updateData = { $addToSet: { memberIds: userId } }
+        } else if (action === 'remove') {
+            updateData = { $pull: { memberIds: userId } }
+        } else {
+            res.status(400)
+            throw new Error('Invalid action! Only "add" or "remove" are accepted.')
+        }
+
+        const updatedCard = await Card.findByIdAndUpdate(cardId, updateData, { returnDocument: 'after' })
+
+        if (!updatedCard) {
+            res.status(404)
+            throw new Error('Card not found!')
+        }
+
+        res.status(200).json({ message: 'Member updated successfully!', card: updatedCard })
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { createNewCard, updateCard, assignMemberToCard }
