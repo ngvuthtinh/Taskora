@@ -65,4 +65,32 @@ const moveCardToDifferentColumn = async (req, res, next) => {
     }
 }
 
-module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn }
+const updateBoard = async (req, res, next) => {
+    try {
+        const boardId = req.params.id
+        const { columnOrderIds, description, title, type } = req.body
+
+        const updateData = {}
+        if (columnOrderIds) updateData.columnOrderIds = columnOrderIds
+        if (description) updateData.description = description
+        if (title) updateData.title = title
+        if (type) updateData.type = type
+
+        const updatedBoard = await Board.findByIdAndUpdate(
+            boardId,
+            updateData,
+            { returnDocument: 'after' }
+        )
+
+        if (!updatedBoard) {
+            res.status(404)
+            throw new Error('Board not found!')
+        }
+
+        res.status(200).json({ message: 'Board updated successfully!', board: updatedBoard })
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard }

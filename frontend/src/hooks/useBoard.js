@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchBoardDetailsAPI } from '../services/boardService';
+import { fetchBoardDetailsAPI, moveCardAPI } from '../services/boardService';
 import { createNewCardAPI } from '../services/cardService';
-import { createNewColumnAPI } from '../services/columnService';
+import { createNewColumnAPI, updateColumnAPI } from '../services/columnService';
 import { toast } from 'react-toastify';
 
 export const useBoard = (boardId) => {
@@ -68,6 +68,62 @@ export const useBoard = (boardId) => {
         }
     };
 
+    // Xử lý kéo thả Card
+    const handleDragCard = async (result) => {
+        const { source, destination, draggableId } = result;
+
+        // Clone board ra để cập nhật UI ngay lập tức (Optimistic UI)
+        const newBoard = { ...board };
+        const prevColIndex = newBoard.columnOrderIds.findIndex(c => c._id === source.droppableId);
+        const nextColIndex = newBoard.columnOrderIds.findIndex(c => c._id === destination.droppableId);
+
+        const prevCol = newBoard.columnOrderIds[prevColIndex];
+        const nextCol = newBoard.columnOrderIds[nextColIndex];
+
+        // Trường hợp 1: Kéo trong cùng 1 Cột
+        if (source.droppableId === destination.droppableId) {
+            const newCards = Array.from(prevCol.cardOrderIds);
+            const [movedCard] = newCards.splice(source.index, 1); // Rút thẻ ra
+            newCards.splice(destination.index, 0, movedCard); // Cắm thẻ vào vị trí mới
+
+            newBoard.columnOrderIds[prevColIndex].cardOrderIds = newCards;
+            setBoard(newBoard);
+
+            // Gọi API chạy ngầm phía sau
+            try {
+                await updateColumnAPI(source.droppableId, { cardOrderIds: newCards.map(c => c._id) });
+            } catch (error) {
+                console.error(error);
+                toast.error('Lỗi khi lưu vị trí kéo thả');
+            }
+        } 
+        // Trường hợp 2: Kéo sang Cột khác
+        else {
+            const prevCards = Array.from(prevCol.cardOrderIds);
+            const nextCards = Array.from(nextCol.cardOrderIds || []);
+
+            const [movedCard] = prevCards.splice(source.index, 1);
+            nextCards.splice(destination.index, 0, movedCard);
+
+            newBoard.columnOrderIds[prevColIndex].cardOrderIds = prevCards;
+            newBoard.columnOrderIds[nextColIndex].cardOrderIds = nextCards;
+            setBoard(newBoard);
+
+            try {
+                await moveCardAPI({
+                    cardId: draggableId,
+                    prevColumnId: source.droppableId,
+                    prevCardOrderIds: prevCards.map(c => c._id),
+                    nextColumnId: destination.droppableId,
+                    nextCardOrderIds: nextCards.map(c => c._id),
+                });
+            } catch (error) {
+                console.error(error);
+                toast.error('Lỗi khi chuyển cột thẻ');
+            }
+        }
+    };
+
     // Chỉ trả ra ngoài những gì cần thiết
-    return { board, createNewCard, createNewColumn };
+    return { board, createNewCard, createNewColumn, handleDragCard };
 };

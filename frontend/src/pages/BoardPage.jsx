@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import Column from '../components/Column/Column';
 import { useBoard } from '../hooks/useBoard';
+import { DragDropContext } from '@hello-pangea/dnd';
 
 const BoardPage = () => {
     const mockBoardId = '69cc8bcc8f41f8e27ec3183e';
     
     // 1. Lấy Data & Logic từ nhà kho Custom Hook
-    const { board, createNewCard, createNewColumn } = useBoard(mockBoardId);
+    const { board, createNewCard, createNewColumn, handleDragCard } = useBoard(mockBoardId);
 
     // 2. Chỉ giữ lại những biến quản lý UI (đóng/mở form, ô gõ chữ)
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
@@ -24,7 +25,24 @@ const BoardPage = () => {
             await createNewColumn(newColumnTitle);
             setNewColumnTitle('');
             toggleOpenNewColumnForm();
-        } catch (error) {}
+        } catch (error) {
+            // Lỗi đã được Toast cảnh báo bên trong Hook, ở đây chỉ cần vắng lặng
+        }
+    };
+
+    const onDragEnd = (result) => {
+        const { source, destination, draggableId, type } = result;
+
+        // Nếu kéo thả ra ngoài không khí (không trúng đích)
+        if (!destination) return;
+
+        // Nếu thả lại đúng chỗ cũ (Cùng Cột và cùng Index)
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+        
+        console.log(`Tiến hành gọi API: Kéo Card ${draggableId} từ cột ${source.droppableId} (vị trí ${source.index}) sang cột ${destination.droppableId} (vị trí ${destination.index})`);
+        
+        // Sắp tới ta sẽ gọi hàm re-order thẻ qua useBoard ở đây!
+        handleDragCard(result);
     };
 
 return (
@@ -33,8 +51,9 @@ return (
             Taskora Board: {board.title}
         </h1>
 
-        <div className="flex-1 p-4 overflow-x-auto overflow-y-hidden">
-            <div className="flex gap-6 h-full items-start">
+        <DragDropContext onDragEnd={onDragEnd}>
+            <div className="flex-1 p-4 overflow-x-auto overflow-y-hidden">
+                <div className="flex gap-6 h-full items-start">
 
                 {board.columnOrderIds?.map(column => (
                     <Column
@@ -86,8 +105,9 @@ return (
                     </div>
                 )}
 
+                </div>
             </div>
-        </div>
+        </DragDropContext>
     </div>
 );
 };

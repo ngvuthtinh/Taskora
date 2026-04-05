@@ -1,5 +1,6 @@
 import Card from '../Card/Card';
 import { useState } from 'react';
+import { Droppable } from '@hello-pangea/dnd';
 
 const Column = ({ column, boardId, createNewCard }) => {
 
@@ -31,12 +32,21 @@ const Column = ({ column, boardId, createNewCard }) => {
             {/* Tiêu đề Cột */}
             <h3 className="font-bold text-gray-700 mb-4 px-1">{column.title}</h3>
 
-            {/* Khu vực chứa các Card (có thể cuộn dọc nếu nhiều thẻ) */}
-            <div className="flex flex-col gap-3 overflow-y-auto overflow-x-hidden custom-scrollbar">
-                {column.cardOrderIds?.map(card => (
-                    <Card key={card._id} card={card} />
-                ))}
-            </div>
+            {/* Khu vực chứa các Card */}
+            <Droppable droppableId={column._id} type="card">
+                {(provided, snapshot) => (
+                    <div 
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`flex flex-col gap-3 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[50px] p-1 ${snapshot.isDraggingOver ? 'bg-gray-200 rounded' : ''}`}
+                    >
+                        {column.cardOrderIds?.map((card, index) => (
+                            <Card key={card._id} card={card} index={index} />
+                        ))}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
 
 
             {!openNewCardForm ? (

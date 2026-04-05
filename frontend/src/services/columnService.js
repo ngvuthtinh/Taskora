@@ -5,3 +5,8 @@ export const createNewColumnAPI = async (newColumnData) => {
     return response.data.column
 }
 
+export const updateColumnAPI = async (columnId, updateData) => {
+    const response = await axiosClient.put(`/columns/${columnId}`, updateData)
+    return response.data.column
+}
+
