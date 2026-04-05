@@ -9,3 +9,8 @@ export const moveCardAPI = async (updateData) => {
     const response = await axiosClient.put(`/boards/supports/moving-card`, updateData);
     return response.data;
 };
+
+export const updateBoardAPI = async (boardId, updateData) => {
+    const response = await axiosClient.put(`/boards/${boardId}`, updateData);
+    return response.data;
+};

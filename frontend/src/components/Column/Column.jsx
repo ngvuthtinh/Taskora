@@ -1,8 +1,8 @@
 import Card from '../Card/Card';
 import { useState } from 'react';
-import { Droppable } from '@hello-pangea/dnd';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 
-const Column = ({ column, boardId, createNewCard }) => {
+const Column = ({ column, boardId, createNewCard, index }) => {
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
 
@@ -28,9 +28,20 @@ const Column = ({ column, boardId, createNewCard }) => {
     }
 
     return (
-        <div className="bg-gray-100 p-4 rounded-xl w-72 shrink-0 flex flex-col max-h-full">
-            {/* Tiêu đề Cột */}
-            <h3 className="font-bold text-gray-700 mb-4 px-1">{column.title}</h3>
+        <Draggable draggableId={column._id} index={index}>
+            {(provided) => (
+                <div 
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className="bg-gray-100 p-4 rounded-xl w-72 shrink-0 flex flex-col max-h-full"
+                >
+                    {/* Tiêu đề Cột - Đây chính là tay cầm để di chuyển cả cột (dragHandle) */}
+                    <h3 
+                        {...provided.dragHandleProps}
+                        className="font-bold text-gray-700 mb-4 px-1 cursor-grab active:cursor-grabbing"
+                    >
+                        {column.title}
+                    </h3>
 
             {/* Khu vực chứa các Card */}
             <Droppable droppableId={column._id} type="card">
@@ -91,7 +102,9 @@ const Column = ({ column, boardId, createNewCard }) => {
                     </div>
                 </div>
             )}
-        </div>
+                </div>
+            )}
+        </Draggable>
     )
 }
 
