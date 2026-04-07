@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchBoardDetailsAPI, moveCardAPI, updateBoardAPI } from '../services/boardService';
+import { fetchBoardDetailsAPI, updateBoardAPI } from '../services/boardService';
 import { createNewCardAPI } from '../services/cardService';
-import { createNewColumnAPI, updateColumnAPI } from '../services/columnService';
+import { createNewColumnAPI } from '../services/columnService';
 import { toast } from 'react-toastify';
 
 export const useBoard = (boardId) => {
@@ -68,80 +68,6 @@ export const useBoard = (boardId) => {
         }
     };
 
-    // Xử lý kéo thả chung (Cả Column và Card)
-    const handleDragCard = async (result) => {
-        const { source, destination, draggableId, type } = result;
-
-        // Xử lý KÉO CỘT NGANG
-        if (type === 'column') {
-            const newBoard = { ...board };
-            const newColumnOrder = Array.from(newBoard.columnOrderIds);
-            const [movedColumn] = newColumnOrder.splice(source.index, 1);
-            newColumnOrder.splice(destination.index, 0, movedColumn);
-            
-            newBoard.columnOrderIds = newColumnOrder;
-            setBoard(newBoard);
-            
-            try {
-                await updateBoardAPI(board._id, { columnOrderIds: newColumnOrder.map(c => c._id) });
-            } catch (error) {
-                toast.error('Lỗi khi lưu vị trí cột');
-                console.error(error);
-            }
-            return;
-        }
-
-        // Xử lý KÉO THẺ DỌC (Card)
-        const newBoard = { ...board };
-        const prevColIndex = newBoard.columnOrderIds.findIndex(c => c._id === source.droppableId);
-        const nextColIndex = newBoard.columnOrderIds.findIndex(c => c._id === destination.droppableId);
-
-        const prevCol = newBoard.columnOrderIds[prevColIndex];
-        const nextCol = newBoard.columnOrderIds[nextColIndex];
-
-        // Trường hợp 1: Kéo thẻ trong cùng 1 Cột
-        if (source.droppableId === destination.droppableId) {
-            const newCards = Array.from(prevCol.cardOrderIds);
-            const [movedCard] = newCards.splice(source.index, 1);
-            newCards.splice(destination.index, 0, movedCard);
-
-            newBoard.columnOrderIds[prevColIndex].cardOrderIds = newCards;
-            setBoard(newBoard);
-
-            try {
-                await updateColumnAPI(source.droppableId, { cardOrderIds: newCards.map(c => c._id) });
-            } catch (error) {
-                console.error(error);
-                toast.error('Lỗi khi lưu vị trí kéo thả thẻ');
-            }
-        } 
-        // Trường hợp 2: Kéo thẻ sang Cột khác
-        else {
-            const prevCards = Array.from(prevCol.cardOrderIds);
-            const nextCards = Array.from(nextCol.cardOrderIds || []);
-
-            const [movedCard] = prevCards.splice(source.index, 1);
-            nextCards.splice(destination.index, 0, movedCard);
-
-            newBoard.columnOrderIds[prevColIndex].cardOrderIds = prevCards;
-            newBoard.columnOrderIds[nextColIndex].cardOrderIds = nextCards;
-            setBoard(newBoard);
-
-            try {
-                await moveCardAPI({
-                    cardId: draggableId,
-                    prevColumnId: source.droppableId,
-                    prevCardOrderIds: prevCards.map(c => c._id),
-                    nextColumnId: destination.droppableId,
-                    nextCardOrderIds: nextCards.map(c => c._id),
-                });
-            } catch (error) {
-                console.error(error);
-                toast.error('Lỗi khi chuyển cột thẻ');
-            }
-        }
-    };
-
     // Chỉ trả ra ngoài những gì cần thiết
-    return { board, createNewCard, createNewColumn, handleDragCard };
+    return { board, createNewCard, createNewColumn };
 };

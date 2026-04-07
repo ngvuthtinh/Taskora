@@ -1,11 +1,9 @@
 import Card from '../Card/Card';
 import { useState } from 'react';
-import { Droppable, Draggable } from '@hello-pangea/dnd';
 
-const Column = ({ column, boardId, createNewCard, index }) => {
+const Column = ({ column, boardId, createNewCard }) => {
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
-
     const [newCardTitle, setNewCardTitle] = useState('')
 
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
@@ -28,40 +26,20 @@ const Column = ({ column, boardId, createNewCard, index }) => {
     }
 
     return (
-        <Draggable draggableId={column._id} index={index}>
-            {(provided) => (
-                <div 
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    className="bg-gray-100 p-4 rounded-xl w-72 shrink-0 flex flex-col max-h-full"
-                >
-                    {/* Tiêu đề Cột - Đây chính là tay cầm để di chuyển cả cột (dragHandle) */}
-                    <h3 
-                        {...provided.dragHandleProps}
-                        className="font-bold text-gray-700 mb-4 px-1 cursor-grab active:cursor-grabbing"
-                    >
-                        {column.title}
-                    </h3>
+        <div className="bg-gray-100 p-4 rounded-xl w-72 shrink-0 flex flex-col max-h-full">
+            {/* Tiêu đề Cột */}
+            <h3 className="font-bold text-gray-700 mb-4 px-1">
+                {column.title}
+            </h3>
 
             {/* Khu vực chứa các Card */}
-            <Droppable droppableId={column._id} type="card">
-                {(provided, snapshot) => (
-                    <div 
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={`flex flex-col gap-3 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[50px] p-1 ${snapshot.isDraggingOver ? 'bg-gray-200 rounded' : ''}`}
-                    >
-                        {column.cardOrderIds?.map((card, index) => (
-                            <Card key={card._id} card={card} index={index} />
-                        ))}
-                        {provided.placeholder}
-                    </div>
-                )}
-            </Droppable>
-
+            <div className="flex flex-col gap-3 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[50px] p-1">
+                {column.cardOrderIds?.map((card, index) => (
+                    <Card key={card._id} card={card} index={index} />
+                ))}
+            </div>
 
             {!openNewCardForm ? (
-                // TRẠNG THÁI 1: NÚT BẤM BÌNH THƯỜNG
                 <button
                     onClick={toggleOpenNewCardForm}
                     className="mt-4 flex items-center gap-2 text-gray-500 hover:text-blue-600 hover:bg-gray-200 p-2 rounded transition-colors w-full text-left text-sm font-medium"
@@ -69,7 +47,6 @@ const Column = ({ column, boardId, createNewCard, index }) => {
                     <span>+ Thêm thẻ mới</span>
                 </button>
             ) : (
-                // TRẠNG THÁI 2: FORM NHẬP LIỆU INLINE (Chuẩn Trello)
                 <div className="mt-3 p-2 bg-white rounded-lg shadow-sm border border-blue-500">
                     <textarea
                         autoFocus
@@ -78,7 +55,6 @@ const Column = ({ column, boardId, createNewCard, index }) => {
                         placeholder="Nhập tiêu đề cho thẻ này..."
                         value={newCardTitle}
                         onChange={(e) => setNewCardTitle(e.target.value)}
-                        // Bắt sự kiện nhấn Enter để tạo luôn, khỏi cần bấm nút
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 e.preventDefault();
@@ -102,9 +78,7 @@ const Column = ({ column, boardId, createNewCard, index }) => {
                     </div>
                 </div>
             )}
-                </div>
-            )}
-        </Draggable>
+        </div>
     )
 }
 
