@@ -5,10 +5,10 @@ import { useBoard } from '../hooks/useBoard';
 const BoardPage = () => {
     const mockBoardId = '69cc8bcc8f41f8e27ec3183e';
 
-    // 1. Lấy Data & Logic từ nhà kho Custom Hook
+    // 1. Get data & logic from the custom hook
     const { board, createNewCard, createNewColumn } = useBoard(mockBoardId);
 
-    // 2. Chỉ giữ lại những biến quản lý UI (đóng/mở form, ô gõ chữ)
+    // 2. Keep only UI state variables (open/close forms, input values)
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const [newColumnTitle, setNewColumnTitle] = useState('');
     const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm);
@@ -25,7 +25,7 @@ const BoardPage = () => {
             setNewColumnTitle('');
             toggleOpenNewColumnForm();
         } catch (error) {
-            // Lỗi đã được Toast cảnh báo bên trong Hook
+            // Error is already shown by Toast inside the Hook
         }
     };
 
@@ -48,7 +48,7 @@ const BoardPage = () => {
                         />
                     ))}
 
-                    {/* Nút thêm Cột mới */}
+                    {/* Add new column button */}
                     {!openNewColumnForm ? (
                         <button
                             onClick={toggleOpenNewColumnForm}

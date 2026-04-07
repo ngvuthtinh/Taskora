@@ -27,12 +27,12 @@ const Column = ({ column, boardId, createNewCard }) => {
 
     return (
         <div className="bg-gray-100 p-4 rounded-xl w-72 shrink-0 flex flex-col max-h-full">
-            {/* Tiêu đề Cột */}
+            {/* Column title */}
             <h3 className="font-bold text-gray-700 mb-4 px-1">
                 {column.title}
             </h3>
 
-            {/* Khu vực chứa các Card */}
+            {/* Card list area */}
             <div className="flex flex-col gap-3 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[50px] p-1">
                 {column.cardOrderIds?.map((card, index) => (
                     <Card key={card._id} card={card} index={index} />

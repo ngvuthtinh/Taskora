@@ -7,14 +7,14 @@ import { toast } from 'react-toastify';
 export const useBoard = (boardId) => {
     const [board, setBoard] = useState(null);
 
-    // Lấy dữ liệu Board ban đầu
+    // Fetch initial board data
     useEffect(() => {
         const loadBoard = async () => {
             try {
                 const boardData = await fetchBoardDetailsAPI(boardId);
                 setBoard(boardData);
             } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu board:', error);
+                console.error('Error fetching board data:', error);
             }
         };
 
@@ -23,7 +23,7 @@ export const useBoard = (boardId) => {
         }
     }, [boardId]);
 
-    // Thêm Card Mới
+    // Add New Card
     const createNewCard = async (newCardData) => {
         try {
             const createdCard = await createNewCardAPI(newCardData);
@@ -40,14 +40,14 @@ export const useBoard = (boardId) => {
                     return col;
                 })
             }));
-            toast.success('Tạo thẻ thành công!');
+            toast.success('Card created successfully!');
         } catch (error) {
-            toast.error('Lỗi khi tạo thẻ mới!');
+            toast.error('Error creating new card!');
             console.error(error);
         }
     };
 
-    // Thêm Cột Mới
+    // Add New Column
     const createNewColumn = async (newColumnTitle) => {
         try {
             const createdColumn = await createNewColumnAPI({
@@ -60,14 +60,16 @@ export const useBoard = (boardId) => {
                 columnOrderIds: [...prevBoard.columnOrderIds, createdColumn]
             }));
             
-            toast.success('Tạo cột thành công!');
+            toast.success('Column created successfully!');
         } catch (error) {
-            toast.error('Lỗi khi tạo cột mới!');
+            toast.error('Error creating new column!');
             console.error(error);
-            throw error; // Ném lỗi ra ngoài để UI biết mà khỏi đóng form nếu lỗi
+            throw error; 
         }
     };
 
-    // Chỉ trả ra ngoài những gì cần thiết
+
+
+    // Only expose what is needed
     return { board, createNewCard, createNewColumn };
 };
