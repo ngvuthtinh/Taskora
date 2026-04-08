@@ -1,15 +1,45 @@
-const Card = ({ card }) => {
-    return (
-        <div className="bg-white p-3 rounded shadow-sm border border-gray-200 cursor-pointer hover:border-blue-500 transition-colors">
-            <h4 className="text-sm font-medium text-gray-800">{card.title}</h4>
-            <h4 className="text-sm font-small text-gray-800">{card.description}</h4>
-            <div className="text-xs text-gray-500 mt-2 flex flex-col gap-1">
-                {card.memberIds?.map(memberId => (
-                    <span key={memberId}>👤 {memberId}</span>
-                ))}
-            </div>
-        </div>
-    )
-}
+// src/components/Card/Card.jsx
+import { useState } from 'react';
+import CardDetailModal from './CardDetailModal';
 
-export default Card
+const Card = ({ card, updateCardInBoard, columnTitle }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    return (
+        <>
+            <div 
+                onClick={() => setIsModalOpen(true)}
+                className="group bg-white p-3 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all duration-200 relative"
+            >
+                <h4 className="text-sm font-medium text-slate-700 leading-snug">{card.title}</h4>
+                
+                {card.description && (
+                    <div className="mt-2 flex items-center text-slate-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                    </div>
+                )}
+                
+                {card.memberIds?.length > 0 && (
+                    <div className="mt-3 flex -space-x-2 overflow-hidden">
+                        {card.memberIds.map((memberId, idx) => (
+                            <div key={idx} className="inline-block w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600">
+                                {memberId.charAt(0).toUpperCase()}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {isModalOpen && (
+                <CardDetailModal 
+                    card={card} 
+                    onClose={() => setIsModalOpen(false)} 
+                    updateCardInBoard={updateCardInBoard}
+                    columnTitle={columnTitle}
+                />
+            )}
+        </>
+    );
+};
+
+export default Card;

@@ -1,41 +1,68 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { loginAPI } from '../services/authService';
+import { loginAPI, registerAPI } from '../services/authService';
 
 const LoginPage = () => {
+    const [isLoginView, setIsLoginView] = useState(true);
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const data = await loginAPI( email, password );
-            localStorage.setItem('token', data.token);
-            toast.success('Đăng nhập thành công!');
-            navigate('/dashboard');
+            if (isLoginView) {
+                const data = await loginAPI(email, password);
+                localStorage.setItem('token', data.token);
+                toast.success('Logged in successfully!');
+                navigate('/dashboard');
+            } else {
+                await registerAPI(name, email, password);
+                toast.success('Account created! You can now sign in.');
+                setIsLoginView(true);
+                setPassword('');
+            }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra!';
+            const errorMessage = error.response?.data?.message || 'Something went wrong!';
             toast.error(errorMessage);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans p-4">
+            <div className="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 w-full max-w-md transition-all duration-300">
+                <div className="mb-8 text-center">
+                    <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                        Taskora
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-500">
+                        {isLoginView ? 'Sign in to your account' : 'Create a new account'}
+                    </p>
+                </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-                    Đăng nhập Taskora
-                </h2>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                    {!isLoginView && (
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
+                            <input
+                                type="text"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all placeholder:text-slate-400 text-slate-700"
+                                placeholder="John Doe"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required
+                            />
+                        </div>
+                    )}
 
-                <form onSubmit={handleLogin} className="flex flex-col gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email address</label>
                         <input
                             type="email"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="admin@gmail.com"
+                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all placeholder:text-slate-400 text-slate-700"
+                            placeholder="you@example.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -43,10 +70,10 @@ const LoginPage = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
                         <input
                             type="password"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all placeholder:text-slate-400 text-slate-700"
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -56,15 +83,32 @@ const LoginPage = () => {
 
                     <button
                         type="submit"
-                        className="w-full mt-4 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200 font-semibold"
+                        className="w-full mt-2 bg-slate-800 text-white py-3 rounded-xl hover:bg-slate-900 transition-all duration-200 font-semibold shadow-md active:scale-[0.98]"
                     >
-                        Đăng nhập
+                        {isLoginView ? 'Sign In' : 'Create Account'}
                     </button>
+
+                    <div className="mt-4 text-center text-sm text-slate-500">
+                        {isLoginView ? (
+                            <>
+                                Don't have an account?{' '}
+                                <button type="button" onClick={() => setIsLoginView(false)} className="text-slate-800 font-semibold hover:underline">
+                                    Sign up
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                Already have an account?{' '}
+                                <button type="button" onClick={() => setIsLoginView(true)} className="text-slate-800 font-semibold hover:underline">
+                                    Sign in
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </form>
             </div>
         </div>
     )
-
 }
 
 export default LoginPage;

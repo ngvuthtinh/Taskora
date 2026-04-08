@@ -4,17 +4,21 @@ import { useBoard } from '../hooks/useBoard';
 
 const BoardPage = () => {
     const mockBoardId = '69cc8bcc8f41f8e27ec3183e';
+    const { board, createNewCard, createNewColumn, updateCardInBoard } = useBoard(mockBoardId);
 
-    // 1. Get data & logic from the custom hook
-    const { board, createNewCard, createNewColumn } = useBoard(mockBoardId);
-
-    // 2. Keep only UI state variables (open/close forms, input values)
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const [newColumnTitle, setNewColumnTitle] = useState('');
     const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm);
 
     if (!board) {
-        return <div className="h-screen flex items-center justify-center text-2xl font-bold">Đang tải dữ liệu...</div>;
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+                    <div className="text-slate-500 font-medium tracking-wide">Loading board...</div>
+                </div>
+            </div>
+        );
     }
 
     const handleCreateNewColumn = async () => {
@@ -30,14 +34,20 @@ const BoardPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-blue-600 p-4">
-            <h1 className="text-white text-3xl font-bold mb-6">
-                Taskora Board: {board.title}
-            </h1>
+        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+            {/* Minimalist Header */}
+            <header className="px-6 py-4 bg-white border-b border-slate-200 flex items-center shrink-0">
+                <h1 className="text-slate-800 text-xl font-bold tracking-tight">
+                    {board.title}
+                </h1>
+                <div className="ml-4 px-2 py-1 bg-slate-100 text-slate-500 text-xs font-semibold rounded-md">
+                    {board.type === 'private' ? 'Private' : 'Public'}
+                </div>
+            </header>
 
-            <div className="flex-1 p-4 overflow-x-auto overflow-y-hidden">
+            {/* Board Content */}
+            <main className="flex-1 p-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
                 <div className="flex gap-6 h-full items-start">
-
                     {board.columnOrderIds?.map((column, index) => (
                         <Column
                             key={column._id}
@@ -45,6 +55,7 @@ const BoardPage = () => {
                             boardId={board._id}
                             createNewCard={createNewCard}
                             index={index}
+                            updateCardInBoard={updateCardInBoard} 
                         />
                     ))}
 
@@ -52,17 +63,18 @@ const BoardPage = () => {
                     {!openNewColumnForm ? (
                         <button
                             onClick={toggleOpenNewColumnForm}
-                            className="bg-white/20 hover:bg-white/30 text-white w-72 shrink-0 p-3 rounded-xl font-bold flex items-center gap-2 transition-colors"
+                            className="bg-white/50 hover:bg-slate-200/50 text-slate-600 border border-slate-300 border-dashed w-72 shrink-0 p-3 rounded-2xl font-medium flex items-center gap-2 transition-all duration-200"
                         >
-                            <span>+ Thêm cột mới</span>
+                            <span className="text-lg leading-none">+</span>
+                            <span>Add another list</span>
                         </button>
                     ) : (
-                        <div className="bg-gray-100 p-3 rounded-xl w-72 shrink-0 flex flex-col">
+                        <div className="bg-white p-3 rounded-2xl w-72 shrink-0 flex flex-col border border-slate-200 shadow-sm">
                             <input
                                 autoFocus
                                 type="text"
-                                className="p-2 border border-blue-500 rounded text-sm outline-none"
-                                placeholder="Nhập tiêu đề cột..."
+                                className="p-2 border border-slate-300 focus:border-slate-800 rounded-lg text-sm outline-none transition-colors"
+                                placeholder="Enter list title..."
                                 value={newColumnTitle}
                                 onChange={(e) => setNewColumnTitle(e.target.value)}
                                 onKeyDown={(e) => {
@@ -72,25 +84,24 @@ const BoardPage = () => {
                                     }
                                 }}
                             />
-                            <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-center gap-2 mt-3">
                                 <button
                                     onClick={handleCreateNewColumn}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1.5 px-3 rounded"
+                                    className="bg-slate-800 hover:bg-slate-900 text-white text-sm py-1.5 px-4 rounded-lg font-medium transition-colors"
                                 >
-                                    Thêm Cột
+                                    Add list
                                 </button>
                                 <button
                                     onClick={toggleOpenNewColumnForm}
-                                    className="text-gray-500 hover:text-gray-800 font-bold px-2 text-lg"
+                                    className="text-slate-400 hover:text-slate-600 font-bold px-2 text-lg"
                                 >
                                     ✕
                                 </button>
                             </div>
                         </div>
                     )}
-
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

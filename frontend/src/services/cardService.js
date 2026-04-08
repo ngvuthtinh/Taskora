@@ -5,7 +5,7 @@ export const createNewCardAPI = async (newCardData) => {
     return response.data.card
 }
 
-export const updateCardAPI = async (cardId, updateData) => {
+export const updateCardDetailsAPI = async (cardId, updateData) => {
     const response = await axiosClient.put(`/cards/${cardId}`, updateData)
     return response.data.card
 }
