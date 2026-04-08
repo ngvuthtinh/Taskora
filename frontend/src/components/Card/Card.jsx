@@ -1,17 +1,44 @@
 // src/components/Card/Card.jsx
 import { useState } from 'react';
 import CardDetailModal from './CardDetailModal';
+import { updateCardDetailsAPI } from '../../services/cardService';
 
 const Card = ({ card, updateCardInBoard, columnTitle }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleToggleComplete = async (e) => {
+        e.stopPropagation();
+        try {
+            const updatedCard = await updateCardDetailsAPI(card._id, { isCompleted: !card.isCompleted });
+            updateCardInBoard({ ...updatedCard, memberIds: card.memberIds });
+        } catch (error) {
+            console.error('Failed to toggle completion');
+        }
+    };
 
     return (
         <>
             <div 
                 onClick={() => setIsModalOpen(true)}
-                className="group bg-white p-3 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all duration-200 relative"
+                className={`group p-3 pr-10 rounded-xl shadow-sm border cursor-pointer transition-all duration-200 relative ${card.isCompleted ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'}`}
             >
-                <h4 className="text-sm font-medium text-slate-700 leading-snug">{card.title}</h4>
+                <button 
+                    onClick={handleToggleComplete}
+                    className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${card.isCompleted ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 text-transparent opacity-0 group-hover:opacity-100 hover:border-green-500 hover:text-green-500'}`}
+                >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                </button>
+                {card.labels?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                        {card.labels.map((label, idx) => (
+                            <span key={idx} style={{ backgroundColor: label.color }} className="px-2 py-0.5 rounded text-[10px] font-semibold text-white">
+                                {label.text || '\u00A0'}
+                            </span>
+                        ))}
+                    </div>
+                )}
+                
+                <h4 className={`text-sm font-medium leading-snug ${card.isCompleted ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{card.title}</h4>
                 
                 {card.description && (
                     <div className="mt-2 flex items-center text-slate-400">
@@ -19,11 +46,18 @@ const Card = ({ card, updateCardInBoard, columnTitle }) => {
                     </div>
                 )}
                 
+                {card.dueDate && (
+                    <div className={`mt-2 flex items-center gap-1 text-[11px] font-medium ${new Date(card.dueDate) < new Date() ? 'text-red-500 bg-red-50 px-1.5 py-0.5 rounded w-max' : 'text-slate-500'}`}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        {new Date(card.dueDate).toLocaleDateString('vi-VN')}
+                    </div>
+                )}
+
                 {card.memberIds?.length > 0 && (
                     <div className="mt-3 flex -space-x-2 overflow-hidden">
-                        {card.memberIds.map((memberId, idx) => (
-                            <div key={idx} className="inline-block w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600">
-                                {memberId.charAt(0).toUpperCase()}
+                        {card.memberIds.map((member, idx) => (
+                            <div key={idx} title={member.name || member.email} className="inline-block w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600">
+                                {(member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()}
                             </div>
                         ))}
                     </div>

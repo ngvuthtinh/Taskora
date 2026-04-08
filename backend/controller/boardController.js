@@ -44,7 +44,11 @@ const getBoardDetails = async (req, res, next) => {
         const board = await Board.findById(boardId).populate({
             path: 'columnOrderIds',
             populate: {
-                path: 'cardOrderIds'
+                path: 'cardOrderIds',
+                populate: {
+                    path: 'memberIds',
+                    select: 'name email'
+                }
             }
         })
 

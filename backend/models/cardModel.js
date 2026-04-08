@@ -19,6 +19,18 @@ const cardSchema = new mongoose.Schema({
     type: String, 
     default: null 
   },
+  labels: [{
+    color: { type: String },
+    text: { type: String }
+  }],
+  dueDate: {
+    type: Date,
+    default: null
+  },
+  isCompleted: {
+    type: Boolean,
+    default: false
+  },
   memberIds: [{
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 

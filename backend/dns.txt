@@ -1,2 +1,0 @@
-[{"name":"ac-k0cbw8s-shard-00-01.okb0pvb.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"},{"name":"ac-k0cbw8s-shard-00-02.okb0pvb.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"},{"name":"ac-k0cbw8s-shard-00-00.okb0pvb.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"}]
-[["authSource=admin&replicaSet=atlas-lz4ugq-shard-0"]]
