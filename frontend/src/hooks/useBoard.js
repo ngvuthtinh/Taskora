@@ -68,8 +68,25 @@ export const useBoard = (boardId) => {
         }
     };
 
+    const updateCardInBoard = (updateCard) => {
+        setBoard(prevBoard => {
+            const newBoard = { ...prevBoard}
+            newBoard.columnOrderIds = newBoard.columnOrderIds.map(col => {
+                if (col._id === updateCard.columnId) {
+                    return {
+                        ...col,
+                        cardOrderIds: col.cardOrderIds.map(c =>
+                            c._id === updatedCard._id ? updatedCard : c
+                        )
+                    }
+                }
+                return col
+            })
+            return newBoard
+        })
+    }
 
 
     // Only expose what is needed
-    return { board, createNewCard, createNewColumn };
+    return { board, createNewCard, createNewColumn, updateCardInBoard };
 };
