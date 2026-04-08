@@ -2,6 +2,16 @@ const Board = require('../models/boardModel')
 const Column = require('../models/columnModel')
 const Card = require('../models/cardModel')
 
+const getAllUserBoards = async (req, res, next) => {
+    try {
+        const ownerId = req.user._id;
+        const boards = await Board.find({ ownerIds: ownerId }).sort({ updatedAt: -1 });
+        res.status(200).json({ boards });
+    } catch (error) {
+        next(error);
+    }
+}
+
 const createNewBoard = async (req, res, next) => {
     try {
         const { title, description, type } = req.body
@@ -93,4 +103,4 @@ const updateBoard = async (req, res, next) => {
     }
 }
 
-module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard }
+module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard, getAllUserBoards }

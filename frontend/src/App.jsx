@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import LoginPage from './pages/LoginPage'
 import BoardPage from './pages/BoardPage';
-
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
 
@@ -13,8 +13,9 @@ function App() {
       <ToastContainer position='top-right' autoClose={2000} />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<BoardPage />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/board/:id" element={<BoardPage />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   )
