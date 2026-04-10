@@ -28,8 +28,9 @@ Mục tiêu: Quản lý phiên làm việc của user một cách nghiêm túc (
 Mục tiêu: Tạo cảm giác đây là một "Sản phẩm hoàn chỉnh" chứ không chỉ là "Một trang code dở".
 
 *   **Trang Dashboard (Trang chủ User):**
-    *   Sau khi Login, user vào trang hiển thị danh sách tất cả các Board của họ.
+    *   Sau khi Login, user vào trang hiển thị danh sách tất cả các Board của họ (bao gồm Board tự tạo và Board được người khác mời).
     *   Nút tạo mới Board.
+    *   **Chia sẻ làm việc chung:** Chức năng Mời Thành Viên (Invite Members) vào quản lý chung Board thông qua Email.
 *   **Trang Cài đặt Tài khoản (Account Settings):**
     *   Người dùng có thể đổi Tên, Đổi mật khẩu.
     *   *Tại sao quan trọng:* Cho thấy bạn biết làm các form cập nhật dữ liệu (`PUT`/`PATCH` API), kết hợp xác thực mật khẩu cũ/mới ở Back-end.

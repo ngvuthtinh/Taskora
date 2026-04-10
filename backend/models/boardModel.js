@@ -18,13 +18,13 @@ const boardSchema = new Schema({
         default: 'public'
     },
     ownerIds: [{
-        type: mongoose.Schema.Types.ObjectId, 
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    columnOrderIds: [{ 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Column' 
+    columnOrderIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Column'
     }]
-}, {timestamps: true})
+}, { timestamps: true })
 
 module.exports = mongoose.model('Board', boardSchema)

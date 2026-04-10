@@ -39,7 +39,7 @@ const BoardPage = () => {
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
             {/* Minimalist Header */}
             <header className="px-6 py-4 bg-white border-b border-slate-200 flex items-center shrink-0">
-                <button 
+                <button
                     onClick={() => navigate('/dashboard')}
                     className="mr-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
                 >
@@ -63,7 +63,7 @@ const BoardPage = () => {
                             boardId={board._id}
                             createNewCard={createNewCard}
                             index={index}
-                            updateCardInBoard={updateCardInBoard} 
+                            updateCardInBoard={updateCardInBoard}
                         />
                     ))}
 
