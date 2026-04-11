@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Column from '../components/Column/Column';
 import { useBoard } from '../hooks/useBoard';
+import Navbar from '../components/Navbar/Navbar';
 
 const BoardPage = () => {
     const { id: boardId } = useParams();
-    const navigate = useNavigate();
     const { board, createNewCard, createNewColumn, updateCardInBoard } = useBoard(boardId);
 
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
@@ -37,21 +37,11 @@ const BoardPage = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-            {/* Minimalist Header */}
-            <header className="px-6 py-4 bg-white border-b border-slate-200 flex items-center shrink-0">
-                <button
-                    onClick={() => navigate('/dashboard')}
-                    className="mr-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
-                <h1 className="text-slate-800 text-xl font-bold tracking-tight">
-                    {board.title}
-                </h1>
-                <div className="ml-4 px-2 py-1 bg-slate-100 text-slate-500 text-xs font-semibold rounded-md">
-                    {board.type === 'private' ? 'Private' : 'Public'}
-                </div>
-            </header>
+            <Navbar
+                showBack
+                title={board.title}
+                badge={board.type === 'private' ? 'Private' : 'Public'}
+            />
 
             {/* Board Content */}
             <main className="flex-1 p-6 overflow-x-auto overflow-y-hidden custom-scrollbar">

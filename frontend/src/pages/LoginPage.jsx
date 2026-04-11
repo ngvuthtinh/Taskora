@@ -16,6 +16,7 @@ const LoginPage = () => {
             if (isLoginView) {
                 const data = await loginAPI(email, password);
                 localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
                 toast.success('Logged in successfully!');
                 navigate('/dashboard');
             } else {
