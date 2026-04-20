@@ -21,6 +21,10 @@ const boardSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    memberIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     columnOrderIds: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Column'

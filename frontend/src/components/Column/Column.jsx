@@ -2,7 +2,7 @@ import Card from '../Card/Card';
 import { useState, useRef, useEffect } from 'react';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 
-const Column = ({ column, boardId, createNewCard, updateCardInBoard, deleteCardInBoard, deleteColumnInBoard, index }) => {
+const Column = ({ column, boardId, createNewCard, updateCardInBoard, deleteCardInBoard, deleteColumnInBoard, index, boardMembers }) => {
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const [newCardTitle, setNewCardTitle] = useState('')
     const [menuOpen, setMenuOpen] = useState(false)
@@ -86,7 +86,15 @@ const Column = ({ column, boardId, createNewCard, updateCardInBoard, deleteCardI
                                 {...provided.droppableProps}
                             >
                                 {column.cardOrderIds?.map((card, cardIndex) => (
-                                    <Card key={card._id} card={card} index={cardIndex} updateCardInBoard={updateCardInBoard} deleteCardInBoard={deleteCardInBoard} columnTitle={column.title} />
+                                    <Card 
+                                        key={card._id} 
+                                        card={card} 
+                                        index={cardIndex} 
+                                        updateCardInBoard={updateCardInBoard} 
+                                        deleteCardInBoard={deleteCardInBoard} 
+                                        columnTitle={column.title} 
+                                        boardMembers={boardMembers}
+                                    />
                                 ))}
                                 {provided.placeholder}
                             </div>

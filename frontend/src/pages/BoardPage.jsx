@@ -4,6 +4,7 @@ import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../components/Column/Column';
 import { useBoard } from '../hooks/useBoard';
 import Navbar from '../components/Navbar/Navbar';
+import ShareModal from '../components/Board/ShareModal';
 
 const BoardPage = () => {
     const { id: boardId } = useParams();
@@ -17,6 +18,7 @@ const BoardPage = () => {
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const [newColumnTitle, setNewColumnTitle] = useState('');
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [boardTitle, setBoardTitle] = useState('');
     const boardMenuRef = useRef(null);
 
@@ -153,7 +155,10 @@ const BoardPage = () => {
                         {board.type.charAt(0).toUpperCase() + board.type.slice(1)}
                     </div>
                     
-                    <button className="bg-slate-800 text-white px-3 py-1.5 rounded-md text-xs font-bold shadow-sm hover:bg-slate-900 transition-colors">
+                    <button 
+                        onClick={() => setIsShareModalOpen(true)}
+                        className="bg-slate-800 text-white px-3 py-1.5 rounded-md text-xs font-bold shadow-sm hover:bg-slate-900 transition-colors"
+                    >
                         Share
                     </button>
                 </div>
@@ -217,6 +222,7 @@ const BoardPage = () => {
                                         updateCardInBoard={updateCardInBoard}
                                         deleteCardInBoard={deleteCardInBoard}
                                         deleteColumnInBoard={deleteColumnInBoard}
+                                        boardMembers={[...(board.ownerIds || []), ...(board.memberIds || [])]}
                                     />
                                 ))}
                                 {provided.placeholder}
@@ -267,6 +273,12 @@ const BoardPage = () => {
                     </Droppable>
                 </DragDropContext>
             </main>
+
+            <ShareModal 
+                isOpen={isShareModalOpen} 
+                onClose={() => setIsShareModalOpen(false)} 
+                board={board} 
+            />
         </div>
     );
 };

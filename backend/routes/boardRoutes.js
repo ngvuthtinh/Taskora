@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard, getAllUserBoards, deleteBoard } = require('../controller/boardController')
+const { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard, getAllUserBoards, deleteBoard, addMemberToBoard } = require('../controller/boardController')
 const { protect } = require('../middlewares/authMiddleware');
 
 router.get('/', protect, getAllUserBoards)
@@ -9,5 +9,6 @@ router.get('/:id', protect, getBoardDetails)
 router.put('/supports/moving-card', protect, moveCardToDifferentColumn)
 router.put('/:id', protect, updateBoard)
 router.delete('/:id', protect, deleteBoard)
+router.post('/:id/members', protect, addMemberToBoard)
 
 module.exports = router

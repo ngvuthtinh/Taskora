@@ -11,20 +11,22 @@ Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Cl
 - [x] Xử lý lưu `token` an toàn ở LocalStorage và gắn vào Axios Instance.
 
 ## 🚧 Sprint 2: Cốt lõi Kanban (Board & Drag-Drop)
-*Trạng thái: Đang thực hiện*
+*Trạng thái: Đã hoàn thành*
 - [x] Backend / Database: Thiết lập schema và API cơ bản cho Board, Column, Card.
 - [x] Frontend UI: Giao diện danh sách Board (Dashboard) và giao diện Kanban bên trong.
 - [x] Tính năng kéo & thả (Drag & Drop) UI Frontend sử dụng `@hello-pangea/dnd`.
 - [x] Gọi API đồng bộ thứ tự Kéo & Thả (`orderIds`) cột và thẻ xuống Database.
-- [ ] Hoàn thiện thao tác CRUD: Cho phép Xóa hoàn toàn Thẻ (Card), Xóa nguyên Cột (Column), và Xóa toàn bộ Bảng (Board). Kể cả sửa tên của chúng.
+- [x] Hoàn thiện thao tác CRUD: Cho phép Xóa hoàn toàn Thẻ (Card), Xóa nguyên Cột (Column), và Xóa toàn bộ Bảng (Board). Kể cả sửa tên của chúng.
 - [x] Chi tiết Card (Modal Card Details): Gắn nhãn màu (Label), Thêm mô tả (Description), Hạn chót (Due Date).
 
 ## ⏳ Sprint 3: Hợp tác & Thành viên (Collaboration)
-*Trạng thái: Chưa làm (Việc bạn vừa đề xuất)*
-- [ ] System ACL (Quyền truy cập): Logic chặn API để chỉ người tạo (Owner) hoặc người được mời mới xem/thao tác được trong Board.
-- [ ] Mời thành viên (Add Members): Thêm user khác vào làm việc chung trong 1 Board.
-- [ ] Gán việc (Assign to Card): Assign member vào riêng từng cụ thể Card (ví dụ Dev A làm task này).
-- [ ] Push Notification (Email): Gửi mail báo cho user khi họ được mời vào Board (Sử dụng Nodemailer / Google SMTP). 
+*Trạng thái: Đang thực hiện*
+- [x] System ACL (Quyền truy cập): Chặn API để chỉ Owner hoặc Member mới thao tác được Board.
+- [x] Mời thành viên (Add Members): Thêm user khác vào Board bằng Email trực tiếp.
+- [ ] Quản lý Shared Link: Logic tạo/hủy link mời duy nhất (Unique Shareable Link).
+- [ ] Phê duyệt tham gia (Join Requests): Xử lý Danh sách chờ - Đồng ý/Từ chối người xin vào bảng.
+- [x] Gán việc (Assign to Card): Giao member vào từng Card cụ thể.
+- [ ] Push Notification (Email): Gửi mail báo khi được mời vào Board/Card. 
 
 ## ⏳ Sprint 4: Cá nhân hóa tài khoản (User Settings)
 *Trạng thái: Chưa làm*
