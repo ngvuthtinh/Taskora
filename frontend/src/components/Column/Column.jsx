@@ -1,7 +1,8 @@
 import Card from '../Card/Card';
 import { useState } from 'react';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
 
-const Column = ({ column, boardId, createNewCard, updateCardInBoard }) => {
+const Column = ({ column, boardId, createNewCard, updateCardInBoard, index }) => {
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const [newCardTitle, setNewCardTitle] = useState('')
 
@@ -25,20 +26,35 @@ const Column = ({ column, boardId, createNewCard, updateCardInBoard }) => {
     }
 
     return (
-        <div className="bg-slate-100/80 p-3 rounded-2xl w-72 shrink-0 flex flex-col max-h-full border border-slate-200/60 shadow-sm">
-            {/* Column title */}
-            <div className="flex items-center justify-between px-2 mb-3 mt-1">
-                <h3 className="font-semibold text-slate-700 text-sm tracking-wide">
-                    {column.title}
-                </h3>
-            </div>
+        <Draggable draggableId={column._id.toString()} index={index}>
+            {(provided) => (
+                <div 
+                    className="bg-slate-100/80 p-3 rounded-2xl w-72 shrink-0 flex flex-col max-h-full border border-slate-200/60 shadow-sm mr-6"
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                >
+                    {/* Column title */}
+                    <div className="flex items-center justify-between px-2 mb-3 mt-1" {...provided.dragHandleProps}>
+                        <h3 className="font-semibold text-slate-700 text-sm tracking-wide">
+                            {column.title}
+                        </h3>
+                    </div>
 
-            {/* Card list area */}
-            <div className="flex flex-col gap-2 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[10px] px-1 pb-1">
-                {column.cardOrderIds?.map((card, index) => (
-                    <Card key={card._id} card={card} index={index} updateCardInBoard={updateCardInBoard} columnTitle={column.title} />
-                ))}
-            </div>
+                    {/* Card list area */}
+                    <Droppable droppableId={column._id.toString()} type="card">
+                        {(provided) => (
+                            <div 
+                                className="flex flex-col overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[10px] px-1 pb-1"
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                            >
+                                {column.cardOrderIds?.map((card, cardIndex) => (
+                                    <Card key={card._id} card={card} index={cardIndex} updateCardInBoard={updateCardInBoard} columnTitle={column.title} />
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
 
             {!openNewCardForm ? (
                 <button
@@ -81,6 +97,8 @@ const Column = ({ column, boardId, createNewCard, updateCardInBoard }) => {
                 </div>
             )}
         </div>
+            )}
+        </Draggable>
     )
 }
 

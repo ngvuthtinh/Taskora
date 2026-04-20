@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchBoardDetailsAPI, updateBoardAPI } from '../services/boardService';
+import { fetchBoardDetailsAPI, updateBoardAPI, moveCardAPI } from '../services/boardService';
 import { createNewCardAPI } from '../services/cardService';
-import { createNewColumnAPI } from '../services/columnService';
+import { createNewColumnAPI, updateColumnAPI } from '../services/columnService';
 import { toast } from 'react-toastify';
 
 export const useBoard = (boardId) => {
@@ -129,6 +129,73 @@ export const useBoard = (boardId) => {
     }
 
 
+    const moveColumn = async (newColumnOrder) => {
+        setBoard(prev => ({
+            ...prev,
+            columnOrderIds: newColumnOrder
+        }));
+        try {
+            await updateBoardAPI(board._id, { columnOrderIds: newColumnOrder.map(c => c._id) });
+        } catch (error) {
+            toast.error('Failed to update column position!');
+        }
+    };
+
+    const moveCardSameCol = async (columnId, newCards) => {
+        setBoard(prev => {
+            const newBoard = { ...prev };
+            newBoard.columnOrderIds = [...newBoard.columnOrderIds]; // Copy array để React render lại mượt không bị khựng
+            
+            const colIndex = newBoard.columnOrderIds.findIndex(c => c._id === columnId);
+            if (colIndex !== -1) {
+                newBoard.columnOrderIds[colIndex] = {
+                    ...newBoard.columnOrderIds[colIndex],
+                    cardOrderIds: newCards
+                };
+            }
+            return newBoard;
+        });
+        try {
+            await updateColumnAPI(columnId, { cardOrderIds: newCards.map(c => c._id) });
+        } catch (error) {
+            toast.error('Failed to update card position!');
+        }
+    };
+
+    const moveCardDiffCol = async (sourceColId, sourceCards, destColId, destCards, activeCardId) => {
+        setBoard(prev => {
+            const newBoard = { ...prev };
+            newBoard.columnOrderIds = [...newBoard.columnOrderIds]; // Copy array
+            
+            const sIdx = newBoard.columnOrderIds.findIndex(c => c._id === sourceColId);
+            const dIdx = newBoard.columnOrderIds.findIndex(c => c._id === destColId);
+            if (sIdx !== -1 && dIdx !== -1) {
+                newBoard.columnOrderIds[sIdx] = { ...newBoard.columnOrderIds[sIdx], cardOrderIds: sourceCards };
+                newBoard.columnOrderIds[dIdx] = { ...newBoard.columnOrderIds[dIdx], cardOrderIds: destCards };
+            }
+            return newBoard;
+        });
+        try {
+            await moveCardAPI({
+                prevColumnId: sourceColId,
+                nextColumnId: destColId,
+                prevCardOrderIds: sourceCards.map(c => c._id),
+                nextCardOrderIds: destCards.map(c => c._id),
+                cardId: activeCardId
+            });
+        } catch (error) {
+            toast.error('Failed to move card to another column!');
+        }
+    };
+
     // Only expose what is needed
-    return { board, createNewCard, createNewColumn, updateCardInBoard };
+    return { 
+        board, 
+        createNewCard, 
+        createNewColumn, 
+        updateCardInBoard,
+        moveColumn,
+        moveCardSameCol,
+        moveCardDiffCol
+    };
 };

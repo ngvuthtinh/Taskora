@@ -1,9 +1,10 @@
 // src/components/Card/Card.jsx
 import { useState } from 'react';
+import { Draggable } from '@hello-pangea/dnd';
 import CardDetailModal from './CardDetailModal';
 import { updateCardDetailsAPI } from '../../services/cardService';
 
-const Card = ({ card, updateCardInBoard, columnTitle }) => {
+const Card = ({ card, updateCardInBoard, columnTitle, index }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleToggleComplete = async (e) => {
@@ -17,11 +18,16 @@ const Card = ({ card, updateCardInBoard, columnTitle }) => {
     };
 
     return (
-        <>
-            <div 
-                onClick={() => setIsModalOpen(true)}
-                className={`group p-3 pr-10 rounded-xl shadow-sm border cursor-pointer transition-all duration-200 relative ${card.isCompleted ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'}`}
-            >
+        <Draggable draggableId={card._id.toString()} index={index}>
+            {(provided) => (
+                <>
+                    <div 
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        onClick={() => setIsModalOpen(true)}
+                        className={`group p-3 pr-10 rounded-xl shadow-sm border cursor-pointer transition-colors transition-shadow duration-200 relative mb-2 ${card.isCompleted ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'}`}
+                    >
                 <button 
                     onClick={handleToggleComplete}
                     className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${card.isCompleted ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 text-transparent opacity-0 group-hover:opacity-100 hover:border-green-500 hover:text-green-500'}`}
@@ -72,7 +78,9 @@ const Card = ({ card, updateCardInBoard, columnTitle }) => {
                     columnTitle={columnTitle}
                 />
             )}
-        </>
+                </>
+            )}
+        </Draggable>
     );
 };
 

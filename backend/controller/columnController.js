@@ -30,13 +30,8 @@ const updateColumn = async (req, res, next) => {
         const { cardOrderIds, title } = req.body
 
         const updateData = {}
-        if (cardOrderIds) {
-            updateData.cardOrderIds = cardOrderIds
-        }
-
-        if (title) {
-            updateData.title = title
-        }
+        if (cardOrderIds) updateData.cardOrderIds = cardOrderIds
+        if (title) updateData.title = title
 
         const updatedColumn = await Column.findByIdAndUpdate(
             columnId,

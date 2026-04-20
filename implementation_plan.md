@@ -14,10 +14,10 @@ Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Cl
 *Trạng thái: Đang thực hiện*
 - [x] Backend / Database: Thiết lập schema và API cơ bản cho Board, Column, Card.
 - [x] Frontend UI: Giao diện danh sách Board (Dashboard) và giao diện Kanban bên trong.
-- [ ] Tính năng kéo & thả (Drag & Drop) UI Frontend sử dụng `@hello-pangea/dnd`.
-- [ ] Gọi API đồng bộ thứ tự Kéo & Thả (`orderIds`) cột và thẻ xuống Database.
+- [x] Tính năng kéo & thả (Drag & Drop) UI Frontend sử dụng `@hello-pangea/dnd`.
+- [x] Gọi API đồng bộ thứ tự Kéo & Thả (`orderIds`) cột và thẻ xuống Database.
 - [ ] Hoàn thiện thao tác CRUD: Cho phép Xóa hoàn toàn Thẻ (Card), Xóa nguyên Cột (Column), và Xóa toàn bộ Bảng (Board). Kể cả sửa tên của chúng.
-- [ ] Chi tiết Card (Modal Card Details): Gắn nhãn màu (Label), Thêm mô tả (Description), Hạn chót (Due Date).
+- [x] Chi tiết Card (Modal Card Details): Gắn nhãn màu (Label), Thêm mô tả (Description), Hạn chót (Due Date).
 
 ## ⏳ Sprint 3: Hợp tác & Thành viên (Collaboration)
 *Trạng thái: Chưa làm (Việc bạn vừa đề xuất)*
