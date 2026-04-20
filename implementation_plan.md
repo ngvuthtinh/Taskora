@@ -1,42 +1,42 @@
-# Kế hoạch phát triển Taskora (Project Apply Intern)
+# 📋 Taskora - Implementation Plan & Checklist
 
-Đây là các tính năng quan trọng nhất được chia thành từng Sprint (Giai đoạn ngắn). Mục tiêu là chứng minh cho nhà tuyển dụng thấy bạn có khả năng làm: **Hoàn thiện luồng ứng dụng thực tế, Hiểu về Authentication/JWT, Hiểu về UI/UX cơ bản, và Chức năng cốt lõi hoạt động ổn định**.
+Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Clone) áp dụng Fullstack MERN. Dưới đây là danh sách các tính năng được định hướng chuẩn Portfolio để gây ấn tượng với nhà tuyển dụng, được sắp xếp theo mức độ ưu tiên.
 
-## Sprint 1: Hoàn thiện chức năng cốt lõi (Core Kanban)
-Mục tiêu: Đảm bảo bảng Board có thể sử dụng được như một Todo App thực tế.
+## ✅ Sprint 1: Nền tảng luồng người dùng (Authentication & Routing)
+*Trạng thái: Đã hoàn thành*
+- [x] Thiết kế UI Trang Đăng nhập / Đăng ký dùng chung (Toggleable).
+- [x] Xây dựng Backend Auth: Đăng ký & Đăng nhập (Mã hóa Hash mật khẩu với `bcryptjs`).
+- [x] Cấp phát và xác thực JWT (`jsonwebtoken`).
+- [x] Phân quyền Routing ở Frontend (`ProtectedRoute`, `PublicRoute`).
+- [x] Xử lý lưu `token` an toàn ở LocalStorage và gắn vào Axios Instance.
 
-*   **[Core] Khôi phục Drag & Drop (Kéo thả):**
-    *   Kéo thả Card giữa các Column.
-    *   Kéo thả các Column để đổi vị trí.
-    *   *Tại sao quan trọng:* Kéo thả là linh hồn của các app dạng Kanban (Trello). Nhà tuyển dụng thường đánh giá cao những ai xử lý mượt API khi thứ tự mảng (`orderIds`) thay đổi.
-*   **[Core] Chi tiết Card (Card Details) Cơ bản:**
-    *   Cho phép gắn Labels (Nhãn màu) để dễ nhìn.
-    *   Thêm Due Dates (Hạn chót) đơn giản để UI thẻ bớt trống trải.
+## 🚧 Sprint 2: Cốt lõi Kanban (Board & Drag-Drop)
+*Trạng thái: Đang thực hiện*
+- [x] Backend / Database: Thiết lập schema và API cơ bản cho Board, Column, Card.
+- [x] Frontend UI: Giao diện danh sách Board (Dashboard) và giao diện Kanban bên trong.
+- [ ] Tính năng kéo & thả (Drag & Drop) UI Frontend sử dụng `@hello-pangea/dnd`.
+- [ ] Gọi API đồng bộ thứ tự Kéo & Thả (`orderIds`) cột và thẻ xuống Database.
+- [ ] Hoàn thiện thao tác CRUD: Cho phép Xóa hoàn toàn Thẻ (Card), Xóa nguyên Cột (Column), và Xóa toàn bộ Bảng (Board). Kể cả sửa tên của chúng.
+- [ ] Chi tiết Card (Modal Card Details): Gắn nhãn màu (Label), Thêm mô tả (Description), Hạn chót (Due Date).
 
-## Sprint 2: Hoàn thiện Luồng Người dùng (Auth Flow & Navbar)
-Mục tiêu: Quản lý phiên làm việc của user một cách nghiêm túc (điều mọi dự án thực tế đều cần).
+## ⏳ Sprint 3: Hợp tác & Thành viên (Collaboration)
+*Trạng thái: Chưa làm (Việc bạn vừa đề xuất)*
+- [ ] System ACL (Quyền truy cập): Logic chặn API để chỉ người tạo (Owner) hoặc người được mời mới xem/thao tác được trong Board.
+- [ ] Mời thành viên (Add Members): Thêm user khác vào làm việc chung trong 1 Board.
+- [ ] Gán việc (Assign to Card): Assign member vào riêng từng cụ thể Card (ví dụ Dev A làm task này).
+- [ ] Push Notification (Email): Gửi mail báo cho user khi họ được mời vào Board (Sử dụng Nodemailer / Google SMTP). 
 
-*   **Authentication (Đăng ký/Đăng nhập/Đăng xuất):**
-    *   Giao diện Signup / Login đẹp mắt.
-    *   Lưu trữ JWT token an toàn ở Frontend (Local Storage hoặc Cookie).
-    *   Điều hướng thông minh (Protect Routes: Chưa login thì bị văng ra Login, đã login thì không vào được trang Login nữa).
-*   **Xây dựng Header / Navbar chung:**
-    *   Có thanh Navbar xuất hiện ở hầu hết các trang.
-    *   Nút User Avatar với Dropdown menu (Profile, Cài đặt, Đăng xuất).
+## ⏳ Sprint 4: Cá nhân hóa tài khoản (User Settings)
+*Trạng thái: Chưa làm*
+- [ ] Page Settings / Profile: Chỉnh sửa thông tin cá nhân (Đổi tên, Đổi hình đại diện Avatar, Đổi mật khẩu).
+- [ ] Đăng nhập bằng Google (Google OAuth2 - Login with Google).
 
-## Sprint 3: Quản lý Board & Cài đặt Cá nhân (Settings)
-Mục tiêu: Tạo cảm giác đây là một "Sản phẩm hoàn chỉnh" chứ không chỉ là "Một trang code dở".
-
-*   **Trang Dashboard (Trang chủ User):**
-    *   Sau khi Login, user vào trang hiển thị danh sách tất cả các Board của họ (bao gồm Board tự tạo và Board được người khác mời).
-    *   Nút tạo mới Board.
-    *   **Chia sẻ làm việc chung:** Chức năng Mời Thành Viên (Invite Members) vào quản lý chung Board thông qua Email.
-*   **Trang Cài đặt Tài khoản (Account Settings):**
-    *   Người dùng có thể đổi Tên, Đổi mật khẩu.
-    *   *Tại sao quan trọng:* Cho thấy bạn biết làm các form cập nhật dữ liệu (`PUT`/`PATCH` API), kết hợp xác thực mật khẩu cũ/mới ở Back-end.
+## 🌟 Sprint 5: Bonus (Điểm cộng mạnh cho Intern - Nếu còn thời gian)
+*Tính năng thêm, bạn cân nhắc làm để vượt qua các ứng viên khác*
+- [ ] Real-time với Socket.io: Khi bạn kéo thẻ ở máy 1, máy 2 cũng thấy thẻ đó thay đổi vị trí ngay lập tức (Trello thật hoạt động như thế).
+- [ ] Lịch sử hoạt động (Activity Logs): Ghi nhận các hành động như "Khôi vừa chuyển thẻ X sang cột Done".
+- [ ] Tìm kiếm (Search): Thanh tìm kiếm nhanh Card hoặc Board trên Header.
 
 ---
-
-## Bạn đánh giá sao về 3 Sprint này?
-Kế hoạch này đảm bảo **Vừa đủ chức năng của Trello, Vừa show off được toàn bộ kỹ năng Web Fullstack**.
-Nếu chốt hướng này, bạn muốn bắt tay vào sửa **Sprint 1 (Khôi phục Kéo Thả và Detail Card)** hay nhảy sang **Sprint 2 (Làm Auth & Navbar)** trước?
+**Gợi ý cách sử dụng:**
+Khi làm xong tính năng nào, bạn chỉ cần sửa `[ ]` thành `[x]` ở file markdown này. Nó sẽ tự động biến thành dấu tick xanh dính liền trên giao diện Github của dự án.
