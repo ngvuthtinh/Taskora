@@ -10,7 +10,7 @@ Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Cl
 - [x] Phân quyền Routing ở Frontend (`ProtectedRoute`, `PublicRoute`).
 - [x] Xử lý lưu `token` an toàn ở LocalStorage và gắn vào Axios Instance.
 
-## 🚧 Sprint 2: Cốt lõi Kanban (Board & Drag-Drop)
+## ✅ Sprint 2: Cốt lõi Kanban (Board & Drag-Drop)
 *Trạng thái: Đã hoàn thành*
 - [x] Backend / Database: Thiết lập schema và API cơ bản cho Board, Column, Card.
 - [x] Frontend UI: Giao diện danh sách Board (Dashboard) và giao diện Kanban bên trong.
@@ -20,25 +20,27 @@ Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Cl
 - [x] Chi tiết Card (Modal Card Details): Gắn nhãn màu (Label), Thêm mô tả (Description), Hạn chót (Due Date).
 
 ## ⏳ Sprint 3: Hợp tác & Thành viên (Collaboration)
-*Trạng thái: Đang thực hiện*
+*Trạng thái: Tạm hoãn để qua Sprint 4*
 - [x] System ACL (Quyền truy cập): Chặn API để chỉ Owner hoặc Member mới thao tác được Board.
 - [x] Mời thành viên (Add Members): Thêm user khác vào Board bằng Email trực tiếp.
 - [ ] Quản lý Shared Link: Logic tạo/hủy link mời duy nhất (Unique Shareable Link).
 - [ ] Phê duyệt tham gia (Join Requests): Xử lý Danh sách chờ - Đồng ý/Từ chối người xin vào bảng.
 - [x] Gán việc (Assign to Card): Giao member vào từng Card cụ thể.
+- [ ] **[BACKEND] Quản lý Role**: Viết API thăng hạng Admin/Member.
+- [ ] **[BACKEND] Member Removal**: Viết logic xóa người khỏi board & rời bảng an toàn.
 - [ ] Push Notification (Email): Gửi mail báo khi được mời vào Board/Card. 
 
-## ⏳ Sprint 4: Cá nhân hóa tài khoản (User Settings)
-*Trạng thái: Chưa làm*
-- [ ] Page Settings / Profile: Chỉnh sửa thông tin cá nhân (Đổi tên, Đổi hình đại diện Avatar, Đổi mật khẩu).
-- [ ] Đăng nhập bằng Google (Google OAuth2 - Login with Google).
+## 🏗️ Sprint 4: Cá nhân hóa tài khoản (User Settings)
+*Trạng thái: Đang thực hiện*
+- [ ] Đổi mật khẩu/Thông tin: Chỉnh sửa tên hiển thị và bảo mật tài khoản.
+- [ ] Ảnh đại diện (Profile Picture): Upload và thay đổi ảnh cá nhân (Cloudinary).
+- [ ] Dark Mode (Giao diện tối): Tích hợp Theme switcher cho hệ thống.
 
-## 🌟 Sprint 5: Bonus (Điểm cộng mạnh cho Intern - Nếu còn thời gian)
-*Tính năng thêm, bạn cân nhắc làm để vượt qua các ứng viên khác*
-- [ ] Real-time với Socket.io: Khi bạn kéo thẻ ở máy 1, máy 2 cũng thấy thẻ đó thay đổi vị trí ngay lập tức (Trello thật hoạt động như thế).
-- [ ] Lịch sử hoạt động (Activity Logs): Ghi nhận các hành động như "Khôi vừa chuyển thẻ X sang cột Done".
-- [ ] Tìm kiếm (Search): Thanh tìm kiếm nhanh Card hoặc Board trên Header.
+## 🚀 [BONUS] Cấp độ "Săn Intern" (Advanced Features)
+- [ ] **Real-time Sync (Socket.io)**: Đồng bộ hoạt động Board ngay lập tức (Kéo thả, sửa card...).
+- [ ] **Activity Logs**: Lưu và hiển thị lịch sử hoạt động trên Board (Audit Trail).
+- [ ] **Search & Filter**: Tìm kiếm thẻ và lọc theo Label/Member.
+- [ ] **Attachments**: Cho phép đính kèm file/hình ảnh vào Card.
 
 ---
-**Gợi ý cách sử dụng:**
-Khi làm xong tính năng nào, bạn chỉ cần sửa `[ ]` thành `[x]` ở file markdown này. Nó sẽ tự động biến thành dấu tick xanh dính liền trên giao diện Github của dự án.
+**Ghi chú:** Khi hoàn thành, hãy đổi `[ ]` thành `[x]` để tick xanh nhiệm vụ.
