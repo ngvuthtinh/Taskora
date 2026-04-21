@@ -253,12 +253,15 @@ export const useBoard = (boardId) => {
      */
     const updateBoardDetails = async (updateData) => {
         try {
-            const updatedBoard = await updateBoardAPI(boardId, updateData);
+            const result = await updateBoardAPI(boardId, updateData);
+            const updatedBoardData = result.board || result;
             setBoard(prev => ({
                 ...prev,
-                ...updatedBoard
+                title: updatedBoardData.title !== undefined ? updatedBoardData.title : prev.title,
+                description: updatedBoardData.description !== undefined ? updatedBoardData.description : prev.description,
+                type: updatedBoardData.type !== undefined ? updatedBoardData.type : prev.type
             }));
-            return updatedBoard;
+            return updatedBoardData;
         } catch (error) {
             toast.error('Failed to update board details');
             throw error;

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { createNewBoardAPI } from '../../services/boardService';
+import { toast } from 'react-toastify';
 
 // Icons
 const UserIcon = () => (
@@ -30,19 +32,70 @@ const BackIcon = () => (
     </svg>
 );
 
+const ThemeIcon = ({ isDark }) => (
+    isDark ? (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+    ) : (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+    )
+);
+
 const Navbar = () => {
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    // Read user from localStorage
-    const user = (() => {
+    const [user, setUser] = useState(() => {
         try {
             return JSON.parse(localStorage.getItem('user')) || null;
         } catch {
             return null;
         }
-    })();
+    });
+
+    const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('theme') === 'dark');
+
+    const toggleTheme = () => {
+        const newTheme = !isDarkMode;
+        setIsDarkMode(newTheme);
+        if (newTheme) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    };
+
+    const handleCreateBoard = async () => {
+        try {
+            const newBoard = await createNewBoardAPI({ title: 'Untitled Board', type: 'private' });
+            toast.success('Board created successfully!');
+            navigate(`/board/${newBoard._id}`);
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to create board');
+        }
+    };
+
+    // Apply exact theme on mount
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        }
+    }, [isDarkMode]);
+
+    // Sync with local storage changes without reloading
+    useEffect(() => {
+        const syncUser = () => {
+            try {
+                setUser(JSON.parse(localStorage.getItem('user')) || null);
+            } catch (e) {}
+        };
+        
+        window.addEventListener('userUpdated', syncUser); // custom event
+        return () => window.removeEventListener('userUpdated', syncUser);
+    }, []);
 
     const initials = user?.name
         ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
@@ -66,10 +119,10 @@ const Navbar = () => {
     };
 
     return (
-        <header className="px-6 py-0 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 h-12 z-[100] shadow-sm">
+        <header className="px-6 py-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 h-12 z-[100] shadow-sm transition-colors duration-300">
             {/* Left: logo & navigation */}
             <div className="flex items-center gap-8">
-                <Link to="/dashboard" className="flex items-center gap-2 text-slate-800 text-lg font-black tracking-tighter hover:opacity-80 transition-opacity">
+                <Link to="/dashboard" className="flex items-center gap-2 text-slate-800 dark:text-white text-lg font-black tracking-tighter hover:opacity-80 transition-opacity">
                     <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.9 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M10,17H8V7H10V17M12,13H10V11H12V13M16,15H14V7H16V15Z"></path></svg>
                     </div>
@@ -77,10 +130,13 @@ const Navbar = () => {
                 </Link>
                 
                 <nav className="hidden md:flex items-center gap-1">
-                    <Link to="/dashboard" className="text-slate-600 hover:bg-slate-100 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors">
+                    <Link to="/dashboard" className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors">
                         Workspaces
                     </Link>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-bold ml-2 shadow-sm transition-all hover:shadow-md">
+                    <button 
+                        onClick={handleCreateBoard}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-bold ml-2 shadow-sm transition-all hover:shadow-md"
+                    >
                         Create
                     </button>
                 </nav>
@@ -93,9 +149,18 @@ const Navbar = () => {
                         <input 
                             type="text" 
                             placeholder="Search" 
-                            className="bg-slate-50 border border-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-md w-40 focus:w-60 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400"
+                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs px-3 py-1.5 rounded-md w-40 focus:w-60 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                     </div>
+                    
+                    <button
+                        onClick={toggleTheme}
+                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors mr-1"
+                        aria-label="Toggle theme"
+                    >
+                        <ThemeIcon isDark={isDarkMode} />
+                    </button>
+
                     <button
                         id="navbar-avatar-btn"
                         onClick={() => setDropdownOpen(prev => !prev)}
@@ -111,17 +176,17 @@ const Navbar = () => {
 
                 {/* Dropdown */}
                 {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                         {/* User info header */}
-                        <div className="px-5 py-4 border-b border-slate-100">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Account</p>
                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center text-sm font-bold">
+                                <div className="w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center text-sm font-bold">
                                     {initials}
                                 </div>
                                 <div className="flex flex-col overflow-hidden">
-                                    <p className="text-sm font-bold text-slate-800 truncate">{user?.name || 'User'}</p>
-                                    <p className="text-xs text-slate-500 truncate">{user?.email || ''}</p>
+                                    <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{user?.name || 'User'}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.email || ''}</p>
                                 </div>
                            </div>
                         </div>
@@ -130,7 +195,7 @@ const Navbar = () => {
                         <div className="py-2">
                              <button
                                 onClick={() => { setDropdownOpen(false); navigate('/settings'); }}
-                                className="w-full flex items-center gap-3 px-5 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors text-left font-medium"
+                                className="w-full flex items-center gap-3 px-5 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-left font-medium"
                             >
                                 <SettingsIcon />
                                 Settings
@@ -138,11 +203,11 @@ const Navbar = () => {
                         </div>
 
                         {/* Logout */}
-                        <div className="border-t border-slate-100 mt-2 pt-2">
+                        <div className="border-t border-slate-100 dark:border-slate-800 mt-2 pt-2">
                             <button
                                 id="navbar-logout-btn"
                                 onClick={handleLogout}
-                                className="w-full flex items-center gap-3 px-5 py-3 text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors text-left font-medium"
+                                className="w-full flex items-center gap-3 px-5 py-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors text-left font-medium"
                             >
                                 Log out
                             </button>

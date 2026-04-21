@@ -77,40 +77,40 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
     }
 
     return (
-        <div className="fixed inset-0 z-[160] overflow-y-auto bg-slate-900/40 backdrop-blur-sm" onClick={onClose}>
+        <div className="fixed inset-0 z-[160] overflow-y-auto bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm transition-colors duration-300" onClick={onClose}>
             {/* Centering Wrapper */}
             <div className="min-h-full flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl relative my-8 flex flex-col animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-2xl shadow-2xl relative my-8 flex flex-col animate-in fade-in zoom-in-95 duration-200 transition-colors" onClick={(e) => e.stopPropagation()}>
                 
                 {/* Header */}
-                <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 flex justify-between items-start shrink-0 sticky top-0 bg-white z-[60] rounded-t-2xl border-b border-transparent">
+                <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 flex justify-between items-start shrink-0 sticky top-0 bg-white dark:bg-slate-900 z-[60] rounded-t-2xl border-b border-transparent transition-colors">
                     <div className="flex-1 pr-10">
                         <input
                             type="text"
-                            className="text-2xl font-bold text-slate-800 w-full outline-none border-b-2 border-transparent focus:border-blue-600 transition-all pb-1 bg-transparent"
+                            className="text-2xl font-bold text-slate-800 dark:text-white w-full outline-none border-b-2 border-transparent focus:border-blue-600 transition-all pb-1 bg-transparent"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
                         <div className="mt-1.5 flex items-center gap-1.5">
-                             <p className="text-sm text-slate-500">In list <span className="font-semibold text-slate-700 underline decoration-slate-200">{columnTitle}</span></p>
+                             <p className="text-base text-slate-500 dark:text-slate-400">In list <span className="font-semibold text-blue-500 dark:text-blue-500 underline decoration-slate-200 dark:decoration-slate-700">{columnTitle}</span></p>
                         </div>
                     </div>
                     
                     <div className="flex gap-2 shrink-0">
                         <div className="relative" ref={menuRef}>
-                            <button onClick={() => setMenuOpen(!menuOpen)} className="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-slate-500">
+                            <button onClick={() => setMenuOpen(!menuOpen)} className="w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 dark:text-slate-400">
                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
                             </button>
                             {menuOpen && (
-                                <div className="absolute right-0 mt-2 w-40 bg-white shadow-xl border border-slate-100 rounded-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
-                                    <button onClick={handleDelete} className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2 font-medium">
+                                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-950 shadow-xl border border-slate-100 dark:border-slate-800 rounded-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                                    <button onClick={handleDelete} className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2 font-medium">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         Delete Card
                                     </button>
                                 </div>
                             )}
                         </div>
-                        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-slate-500 font-bold">✕</button>
+                        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 dark:text-slate-400 font-bold">✕</button>
                     </div>
                 </div>
 
@@ -131,19 +131,19 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                                 </div>
                             ))}
                             <div className="relative" ref={labelRef}>
-                                <button onClick={() => setLabelMenuOpen(!labelMenuOpen)} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-all">+</button>
+                                <button onClick={() => setLabelMenuOpen(!labelMenuOpen)} className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-all">+</button>
                                 {labelMenuOpen && (
-                                    <div className="absolute top-0 left-0 p-3 bg-white shadow-2xl border border-slate-100 rounded-xl z-[100] w-52 animate-in fade-in zoom-in-95 duration-150">
+                                    <div className="absolute top-0 left-0 p-3 bg-white dark:bg-slate-900 shadow-2xl dark:shadow-black border border-slate-100 dark:border-slate-800 rounded-xl z-[100] w-52 animate-in fade-in zoom-in-95 duration-150">
                                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Select label</p>
                                         <div className="grid grid-cols-1 gap-1">
                                             {COLORS.map(color => {
                                                 const isSelected = labels.find(l => l.color === color);
                                                 const boardLabel = boardLabels.find(bl => bl.color === color);
                                                 return (
-                                                    <button key={color} onClick={() => toggleLabel(color)} className={`w-full flex items-center gap-2.5 p-1.5 rounded-lg transition-all ${isSelected ? 'bg-slate-50 ring-1 ring-slate-200' : 'hover:bg-slate-50'}`}>
+                                                    <button key={color} onClick={() => toggleLabel(color)} className={`w-full flex items-center gap-2.5 p-1.5 rounded-lg transition-all ${isSelected ? 'bg-slate-50 dark:bg-slate-800/50 ring-1 ring-slate-200 dark:ring-slate-700' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                                                         <div className="w-5 h-5 rounded shadow-sm" style={{ backgroundColor: color }}></div>
-                                                        <span className="flex-1 text-[11px] font-semibold text-slate-600 text-left truncate">{boardLabel?.text || (isSelected ? labels.find(l => l.color === color).text : '') || 'Untitled'}</span>
-                                                        {isSelected && <svg className="w-3.5 h-3.5 text-slate-800" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>}
+                                                        <span className="flex-1 text-[11px] font-semibold text-slate-600 dark:text-white text-left truncate">{boardLabel?.text || (isSelected ? labels.find(l => l.color === color).text : '') || 'Untitled'}</span>
+                                                        {isSelected && <svg className="w-3.5 h-3.5 text-slate-800 dark:text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>}
                                                     </button>
                                                 )
                                             })}
@@ -156,12 +156,12 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
 
                     {/* Description */}
                     <div className="space-y-3">
-                        <label className="text-xs font-semibold text-slate-700 flex items-center gap-2">
+                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
                              Description
                         </label>
                         <textarea
-                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-y min-h-[120px] transition-all text-slate-700 text-sm placeholder:text-slate-400 shadow-inner"
+                            className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-y min-h-[120px] transition-all text-slate-700 dark:text-slate-200 text-sm placeholder:text-slate-400 shadow-inner"
                             placeholder="Add card details..."
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -173,7 +173,7 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                         
                         {/* Member Sidebar Section */}
                         <div className="space-y-3">
-                            <label className="text-xs font-semibold text-slate-700 flex items-center gap-2">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                                 Members
                             </label>
@@ -181,12 +181,12 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                             {/* Scrollable member list */}
                             <div className="flex flex-col gap-2 max-h-[140px] overflow-y-auto custom-scrollbar pr-1 mb-2">
                                 {card.memberIds?.map((member) => (
-                                    <div key={member._id} className="flex items-center gap-2.5 p-2 bg-slate-50 border border-slate-50 rounded-xl group hover:bg-slate-100 transition-all">
+                                    <div key={member._id} className="flex items-center gap-2.5 p-2 bg-slate-50 dark:bg-slate-800 border border-slate-50 dark:border-slate-800 rounded-xl group hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
                                         <div className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white text-[10px] shrink-0">
                                             {(member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()}
                                         </div>
-                                        <span className="text-xs font-medium text-slate-700 truncate flex-1">{member.name || member.email}</span>
-                                        <button onClick={() => handleToggleMember(member._id)} className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-0.5"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-200 truncate flex-1">{member.name || member.email}</span>
+                                        <button onClick={() => handleToggleMember(member._id)} className="text-slate-300 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-0.5"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                                     </div>
                                 ))}
                             </div>
@@ -195,24 +195,24 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                             <div className="relative" ref={assignMenuRef}>
                                 <button 
                                     onClick={() => setAssignMenuOpen(!assignMenuOpen)} 
-                                    className="flex items-center gap-2 w-full px-3 py-2 bg-slate-50 border border-slate-200 border-dashed text-slate-500 rounded-xl text-xs font-semibold hover:border-blue-400 hover:text-blue-600 transition-all"
+                                    className="flex items-center gap-2 w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 border-dashed text-slate-500 dark:text-slate-400 rounded-xl text-xs font-semibold hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
                                 >
                                     <span className="text-base font-normal pr-0.5">+</span> Assign member
                                 </button>
 
                                 {assignMenuOpen && (
-                                    <div className="absolute top-0 left-0 w-full min-w-[220px] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-100 rounded-xl py-2 z-[200] animate-in fade-in zoom-in-95 duration-150 origin-top-left">
+                                    <div className="absolute top-0 left-0 w-full min-w-[220px] bg-white dark:bg-slate-900 shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:shadow-black border border-slate-100 dark:border-slate-800 rounded-xl py-2 z-[200] animate-in fade-in zoom-in-95 duration-150 origin-top-left">
                                         <p className="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wide">Board members</p>
                                         <div className="max-h-[180px] overflow-y-auto custom-scrollbar">
                                             {boardMembers.map(member => {
                                                 const isAssigned = card.memberIds?.some(m => m._id === member._id);
                                                 return (
-                                                    <button key={member._id} onClick={() => handleToggleMember(member._id)} className="w-full flex items-center gap-3 px-3 py-1.5 hover:bg-slate-50 transition-colors">
-                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[9px] ${isAssigned ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500'}`}>
+                                                    <button key={member._id} onClick={() => handleToggleMember(member._id)} className={`w-full flex items-center gap-3 px-3 py-1.5 transition-colors ${isAssigned ? 'dark:bg-slate-800/50' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[9px] ${isAssigned ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
                                                             {(member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()}
                                                         </div>
-                                                        <span className={`text-xs font-medium flex-1 truncate ${isAssigned ? 'text-blue-600' : 'text-slate-600'}`}>{member.name || member.email}</span>
-                                                        {isAssigned && <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>}
+                                                        <span className={`text-xs font-medium flex-1 truncate ${isAssigned ? 'text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300'}`}>{member.name || member.email}</span>
+                                                        {isAssigned && <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>}
                                                     </button>
                                                 );
                                             })}
@@ -224,13 +224,13 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
 
                         {/* Due Date Subsection */}
                         <div className="space-y-3">
-                            <label className="text-xs font-semibold text-slate-700 flex items-center gap-2">
+                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 Due Date
                             </label>
                             <input
                                 type="date"
-                                className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-medium text-slate-700 shadow-inner w-full"
+                                className="p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-blue-500 transition-all text-sm font-medium text-slate-700 dark:text-slate-200 shadow-inner w-full"
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
                             />
@@ -240,9 +240,9 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                 </div>
 
                 {/* Footer */}
-                <div className="p-5 sm:p-8 bg-slate-50 flex flex-wrap justify-end gap-3 mt-auto shrink-0 sticky bottom-0 z-[60] rounded-b-2xl border-t border-slate-100">
-                    <button onClick={onClose} className="px-5 py-2.5 text-slate-500 hover:text-slate-800 rounded-lg text-sm font-semibold transition-all">Cancel</button>
-                    <button onClick={handleSave} className="px-8 py-2.5 bg-slate-800 hover:bg-black text-white rounded-xl text-sm font-bold shadow-md transition-all active:scale-95">Save Changes</button>
+                <div className="p-5 sm:p-8 bg-slate-50 dark:bg-slate-950 flex flex-wrap justify-end gap-3 mt-auto shrink-0 sticky bottom-0 z-[60] rounded-b-2xl border-t border-slate-100 dark:border-slate-800 transition-colors">
+                    <button onClick={onClose} className="px-5 py-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg text-sm font-semibold transition-all">Cancel</button>
+                    <button onClick={handleSave} className="px-8 py-2.5 bg-slate-800 dark:bg-blue-600 hover:bg-black dark:hover:bg-blue-500 text-white rounded-xl text-sm font-bold shadow-md transition-all active:scale-95">Save Changes</button>
                 </div>
                 </div>
             </div>

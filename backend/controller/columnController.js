@@ -54,21 +54,21 @@ const updateColumn = async (req, res, next) => {
 const deleteColumn = async (req, res, next) => {
     try {
         const columnId = req.params.id
-        const column = Column.findById(columnId)
+        const column = await Column.findById(columnId)
 
         if (!column) {
             res.status(404)
-            throw new Error('Card not found!')
+            throw new Error('Column not found!')
         }
 
-        await Column.findByIdAndDelete(column)
+        await Column.findByIdAndDelete(columnId)
 
         await Card.deleteMany({columnId: columnId})
 
-        await Board.findByIdAndDelete(column.boardId, {
+        await Board.findByIdAndUpdate(column.boardId, {
             $pull: { columnOrderIds: columnId }
         })
-        res.status(200).json({ message: 'Card deleted successfully!' })
+        res.status(200).json({ message: 'Column deleted successfully!' })
     } catch (error) {
         next(error)
     }

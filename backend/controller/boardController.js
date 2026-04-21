@@ -104,10 +104,10 @@ const updateBoard = async (req, res, next) => {
         const { columnOrderIds, description, title, type } = req.body
 
         const updateData = {}
-        if (columnOrderIds) updateData.columnOrderIds = columnOrderIds
-        if (description) updateData.description = description
-        if (title) updateData.title = title
-        if (type) updateData.type = type
+        if (columnOrderIds !== undefined) updateData.columnOrderIds = columnOrderIds
+        if (description !== undefined) updateData.description = description
+        if (title !== undefined) updateData.title = title
+        if (type !== undefined) updateData.type = type
 
         const updatedBoard = await Board.findByIdAndUpdate(
             boardId,
@@ -310,7 +310,7 @@ const updateMemberRole = async (req, res, next) => {
 
 
 
-        const updateRole = await Board.findByIdAndUpdate(
+        const updatedBoard = await Board.findByIdAndUpdate(
             boardId,
             updateData,
             { returnDocument: 'after' }
@@ -318,12 +318,12 @@ const updateMemberRole = async (req, res, next) => {
             'ownerIds memberIds', 'name email'
         )
 
-        if (!updateRole) {
+        if (!updatedBoard) {
             res.status(404)
             throw new Error('Can not update Role!')
         }
 
-        res.status(200).json({ message: 'Member Role updated successfully!', board: updateRole })
+        res.status(200).json({ message: 'Member Role updated successfully!', board: updatedBoard })
 
     } catch (error) {
         next(error);

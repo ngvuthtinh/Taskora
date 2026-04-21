@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../components/Column/Column';
 import { useBoard } from '../hooks/useBoard';
@@ -20,6 +21,8 @@ const BoardPage = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [boardTitle, setBoardTitle] = useState('');
+    const [boardDescription, setBoardDescription] = useState('');
+    const [isSavingDesc, setIsSavingDesc] = useState(false);
     const boardMenuRef = useRef(null);
 
     const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm);
@@ -27,7 +30,8 @@ const BoardPage = () => {
     // Sync boardTitle with board object when it loads
     useEffect(() => {
         if (board?.title) setBoardTitle(board.title);
-    }, [board?.title]);
+        if (board?.description !== undefined) setBoardDescription(board.description);
+    }, [board?.title, board?.description]);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -52,12 +56,25 @@ const BoardPage = () => {
             setBoardTitle(board.title);
         }
     };
+
+    const handleBoardDescriptionUpdate = async () => {
+        if (boardDescription.trim() === (board.description || '')) return;
+        setIsSavingDesc(true);
+        try {
+            await updateBoardDetails({ description: boardDescription.trim() });
+            toast.success('Description updated!');
+        } catch (error) {
+            setBoardDescription(board.description || '');
+        } finally {
+            setIsSavingDesc(false);
+        }
+    };
     if (!board) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-300">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-8 h-8 border-4 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
-                    <div className="text-slate-500 font-medium tracking-wide">Loading board...</div>
+                    <div className="w-8 h-8 border-4 border-slate-300 dark:border-slate-700 border-t-slate-600 dark:border-t-slate-400 rounded-full animate-spin"></div>
+                    <div className="text-slate-500 dark:text-slate-400 font-medium tracking-wide">Loading board...</div>
                 </div>
             </div>
         );
@@ -125,15 +142,15 @@ const BoardPage = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-50 flex flex-col font-sans overflow-hidden">
+        <div className="h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans overflow-hidden transition-colors duration-300">
             {/* Tầng 1: App Bar (Sử dụng Navbar component đã tinh gọn) */}
             <Navbar />
 
             {/* Tầng 2: Board Bar (Thông tin riêng của bảng) */}
-            <div className="h-14 px-4 flex items-center justify-between border-b border-slate-200 bg-white/90 backdrop-blur-md shrink-0">
+            <div className="h-14 px-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shrink-0 transition-colors duration-300">
                 <div className="flex items-center gap-4">
                     <input 
-                        className="text-xl font-extrabold text-slate-800 tracking-tight bg-transparent border-2 border-transparent hover:border-slate-200 focus:border-blue-500 focus:bg-white rounded-lg px-2 py-1 outline-none transition-all cursor-text min-w-[50px]"
+                        className="text-xl font-extrabold text-slate-800 dark:text-white tracking-tight bg-transparent border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-lg px-2 py-1 outline-none transition-all cursor-text min-w-[50px]"
                         style={{ width: `${(boardTitle?.length || 5) + 2}ch` }}
                         value={boardTitle}
                         onChange={(e) => setBoardTitle(e.target.value)}
@@ -142,9 +159,9 @@ const BoardPage = () => {
                         spellCheck={false}
                     />
                     
-                    <div className="h-4 w-[1px] bg-slate-300 mx-1"></div>
+                    <div className="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1"></div>
                     
-                    <button className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-slate-100 rounded-md transition-colors">
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">
                         <svg className="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
                     </button>
                 </div>
@@ -177,25 +194,45 @@ const BoardPage = () => {
                         Share
                     </button>
 
-                    <div className="h-4 w-[1px] bg-slate-300 mx-1"></div>
+                    <div className="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1"></div>
 
                     {/* Board Action Menu */}
                     <div className="relative" ref={boardMenuRef}>
                         <button 
                             onClick={() => setMenuOpen(!menuOpen)}
-                            className="flex items-center justify-center w-8 h-8 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors"
+                            className="flex items-center justify-center w-8 h-8 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 transition-colors"
                         >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
                         </button>
 
                         {menuOpen && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white shadow-xl border border-slate-200 rounded-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150 origin-top-right">
+                            <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800 rounded-2xl py-2 z-[200] animate-in fade-in zoom-in-95 duration-150 origin-top-right flex flex-col">
+                                <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Description</p>
+                                        <button 
+                                            onClick={handleBoardDescriptionUpdate}
+                                            disabled={isSavingDesc}
+                                            className="text-xs font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 px-3 py-1 rounded hover:bg-blue-200 dark:hover:bg-blue-800/40 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[50px]"
+                                        >
+                                            {isSavingDesc ? (
+                                                <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                            ) : 'Save'}
+                                        </button>
+                                    </div>
+                                    <textarea
+                                        value={boardDescription}
+                                        onChange={(e) => setBoardDescription(e.target.value)}
+                                        placeholder="Add a board description..."
+                                        className="w-full text-sm p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-900 rounded-lg outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20 resize-none h-24 text-slate-700 dark:text-slate-300 placeholder:text-slate-400 transition-all font-medium custom-scrollbar"
+                                    />
+                                </div>
                                 <button 
                                     onClick={() => {
                                         setMenuOpen(false);
                                         deleteBoardInProject();
                                     }}
-                                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors font-semibold"
+                                    className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-3 transition-colors font-bold mt-1"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     Delete Board
@@ -207,7 +244,7 @@ const BoardPage = () => {
             </div>
 
             {/* Board Content Area */}
-            <main className="flex-1 p-4 overflow-x-auto overflow-y-hidden custom-scrollbar bg-slate-50">
+            <main className="flex-1 p-4 overflow-x-auto overflow-y-hidden custom-scrollbar bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
                 <DragDropContext onDragEnd={handleDragEnd}>
                     <Droppable droppableId="board" type="column" direction="horizontal">
                         {(provided) => (
@@ -235,17 +272,17 @@ const BoardPage = () => {
                                 {!openNewColumnForm ? (
                                     <button
                                         onClick={toggleOpenNewColumnForm}
-                                        className="bg-slate-200/50 hover:bg-slate-200 text-slate-700 border border-slate-300 border-dashed w-72 shrink-0 p-3 rounded-2xl font-semibold flex items-center gap-2 transition-all"
+                                        className="bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 border-dashed w-72 shrink-0 p-3 rounded-2xl font-semibold flex items-center gap-2 transition-all"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
                                         Add another list
                                     </button>
                                 ) : (
-                                    <div className="bg-slate-100 p-3 rounded-2xl w-72 shrink-0 flex flex-col border border-slate-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="bg-slate-100 dark:bg-slate-900 p-3 rounded-2xl w-72 shrink-0 flex flex-col border border-slate-200 dark:border-slate-800 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
                                         <input
                                             autoFocus
                                             type="text"
-                                            className="p-2.5 bg-white border border-slate-300 focus:ring-2 focus:ring-slate-800 rounded-xl text-sm outline-none transition-all"
+                                            className="p-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 rounded-xl text-sm outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                                             placeholder="Enter list title..."
                                             value={newColumnTitle}
                                             onChange={(e) => setNewColumnTitle(e.target.value)}
@@ -259,13 +296,13 @@ const BoardPage = () => {
                                         <div className="flex items-center gap-2 mt-3">
                                             <button
                                                 onClick={handleCreateNewColumn}
-                                                className="bg-slate-800 hover:bg-slate-900 text-white text-sm py-2 px-4 rounded-xl font-bold transition-colors"
+                                                className="bg-slate-800 dark:bg-blue-600 hover:bg-slate-900 dark:hover:bg-blue-700 text-white text-sm py-2 px-4 rounded-xl font-bold transition-colors"
                                             >
                                                 Add list
                                             </button>
                                             <button
                                                 onClick={toggleOpenNewColumnForm}
-                                                className="p-2 text-slate-500 hover:bg-slate-200 rounded-xl transition-colors"
+                                                className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors"
                                             >
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                             </button>
