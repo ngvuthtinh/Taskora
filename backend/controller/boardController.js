@@ -110,7 +110,7 @@ const updateBoard = async (req, res, next) => {
 const deleteBoard = async (req, res, next) => {
     try {
         const boardId = req.params.id
-        const board = findById(boardId)
+        const board = await Board.findById(boardId)
 
         if (!board) {
             res.status(404)

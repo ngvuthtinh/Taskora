@@ -239,7 +239,7 @@ export const useBoard = (boardId) => {
         try {
             await deleteBoardAPI(boardId);
             toast.success('Board deleted successfully!');
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
             toast.error('Failed to delete board');
         }
