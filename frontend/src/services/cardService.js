@@ -14,3 +14,8 @@ export const assignMemberToCardAPI = async (cardId, payload) => {
     const response = await axiosClient.put(`/cards/${cardId}/members`, payload)
     return response.data.card
 }
+
+export const deleteCardAPI = async (cardId) => {
+    const response = await axiosClient.delete(`/cards/${cardId}`);
+    return response.data;
+};

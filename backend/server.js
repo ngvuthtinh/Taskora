@@ -14,12 +14,13 @@ const app = express();
 // Connect DB
 connectDB();
 
-app.use(cors())
-app.use(express.json())
+app.use(cors({
+  origin: 'http://localhost:5173', // Chỉ ông này được gọi, mấy ông khác cấm
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true
+}))
 
-app.get('/', (req, res) => {
-    console.log("Hello")
-})
+app.use(express.json())
 
 
 app.use('/api/auth', authRoutes);

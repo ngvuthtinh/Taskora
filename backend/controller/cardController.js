@@ -98,4 +98,25 @@ const assignMemberToCard = async (req, res, next) => {
     }
 }
 
-module.exports = { createNewCard, updateCard, assignMemberToCard }
+const deleteCard = async (req, res, next) => {
+    try {
+        const cardId = req.params.id
+        const card = await Card.findById(cardId)
+
+        if (!card) {
+            res.status(404)
+            throw new Error('Card not found!')
+        }
+
+        await Card.findByIdAndDelete(cardId)
+
+        await Column.findByIdAndUpdate(card.columnId, {
+            $pull: { cardOrderIds: cardId }
+        })
+        res.status(200).json({ message: 'Card deleted successfully!' })
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { createNewCard, updateCard, assignMemberToCard, deleteCard }

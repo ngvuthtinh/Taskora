@@ -30,7 +30,7 @@ const BackIcon = () => (
     </svg>
 );
 
-const Navbar = ({ title, showBack = false, badge = null }) => {
+const Navbar = () => {
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -66,90 +66,101 @@ const Navbar = ({ title, showBack = false, badge = null }) => {
     };
 
     return (
-        <header className="px-6 py-0 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 h-14 shadow-sm">
-            {/* Left: logo + optional back button + title */}
-            <div className="flex items-center gap-3">
-                {showBack && (
-                    <button
-                        onClick={() => navigate('/dashboard')}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
-                        aria-label="Back to dashboard"
-                    >
-                        <BackIcon />
-                    </button>
-                )}
-
-                {!showBack && (
-                    <Link to="/dashboard" className="text-slate-800 text-xl font-extrabold tracking-tight hover:opacity-80 transition-opacity">
-                        Taskora
+        <header className="px-6 py-0 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 h-12 z-[100] shadow-sm">
+            {/* Left: logo & navigation */}
+            <div className="flex items-center gap-8">
+                <Link to="/dashboard" className="flex items-center gap-2 text-slate-800 text-lg font-black tracking-tighter hover:opacity-80 transition-opacity">
+                    <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+                       <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.9 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M10,17H8V7H10V17M12,13H10V11H12V13M16,15H14V7H16V15Z"></path></svg>
+                    </div>
+                    Taskora
+                </Link>
+                
+                <nav className="hidden md:flex items-center gap-1">
+                    <Link to="/dashboard" className="text-slate-600 hover:bg-slate-100 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors">
+                        Workspaces
                     </Link>
-                )}
-
-                {title && (
-                    <>
-                        {showBack && <span className="text-slate-300 font-light text-lg">/</span>}
-                        <span className="text-slate-800 text-base font-bold tracking-tight">{title}</span>
-                        {badge && (
-                            <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-semibold rounded-md">{badge}</span>
-                        )}
-                    </>
-                )}
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-bold ml-2 shadow-sm transition-all hover:shadow-md">
+                        Create
+                    </button>
+                </nav>
             </div>
 
             {/* Right: avatar + dropdown */}
             <div className="relative" ref={dropdownRef}>
-                <button
-                    id="navbar-avatar-btn"
-                    onClick={() => setDropdownOpen(prev => !prev)}
-                    className="flex items-center gap-2.5 rounded-full pl-2.5 pr-1 py-1 hover:bg-slate-100 transition-colors group"
-                    aria-label="Open user menu"
-                    aria-expanded={dropdownOpen}
-                >
-                    <span className="text-sm font-semibold text-slate-600 hidden sm:block group-hover:text-slate-900 transition-colors">
-                        {user?.name || 'Account'}
-                    </span>
-                    <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold shadow-sm select-none">
-                        {initials}
+                <div className="flex items-center gap-2">
+                    <div className="relative mr-2">
+                        <input 
+                            type="text" 
+                            placeholder="Search" 
+                            className="bg-slate-50 border border-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-md w-40 focus:w-60 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400"
+                        />
                     </div>
-                </button>
+                    <button
+                        id="navbar-avatar-btn"
+                        onClick={() => setDropdownOpen(prev => !prev)}
+                        className="flex items-center gap-1 rounded-full p-0.5 hover:ring-2 hover:ring-white/20 transition-all group"
+                        aria-label="Open user menu"
+                        aria-expanded={dropdownOpen}
+                    >
+                        <div className="w-8 h-8 rounded-full bg-slate-700 text-white border border-white/20 flex items-center justify-center text-xs font-bold shadow-sm select-none overflow-hidden">
+                            {initials}
+                        </div>
+                    </button>
+                </div>
 
                 {/* Dropdown */}
                 {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                         {/* User info header */}
-                        <div className="px-4 py-3 border-b border-slate-100">
-                            <p className="text-sm font-semibold text-slate-800 truncate">{user?.name || 'User'}</p>
-                            <p className="text-xs text-slate-400 truncate mt-0.5">{user?.email || ''}</p>
+                        <div className="px-5 py-4 border-b border-slate-100">
+                           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Account</p>
+                           <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center text-sm font-bold">
+                                    {initials}
+                                </div>
+                                <div className="flex flex-col overflow-hidden">
+                                    <p className="text-sm font-bold text-slate-800 truncate">{user?.name || 'User'}</p>
+                                    <p className="text-xs text-slate-500 truncate">{user?.email || ''}</p>
+                                </div>
+                           </div>
                         </div>
 
                         {/* Menu items */}
-                        <div className="py-1.5">
+                        <div className="py-2">
                             <button
-                                id="navbar-profile-btn"
                                 onClick={() => { setDropdownOpen(false); navigate('/profile'); }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                                className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors text-left"
                             >
-                                <span className="text-slate-400"><UserIcon /></span>
-                                Profile
+                                Profile and Visibility
                             </button>
                             <button
-                                id="navbar-settings-btn"
                                 onClick={() => { setDropdownOpen(false); navigate('/settings'); }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                                className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors text-left"
                             >
-                                <span className="text-slate-400"><SettingsIcon /></span>
+                                Activity
+                            </button>
+                             <button
+                                onClick={() => { setDropdownOpen(false); navigate('/settings'); }}
+                                className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                            >
+                                Cards
+                            </button>
+                             <button
+                                onClick={() => { setDropdownOpen(false); navigate('/settings'); }}
+                                className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                            >
                                 Settings
                             </button>
                         </div>
 
                         {/* Logout */}
-                        <div className="border-t border-slate-100 pt-1.5">
+                        <div className="border-t border-slate-100 mt-2 pt-2">
                             <button
                                 id="navbar-logout-btn"
                                 onClick={handleLogout}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors text-left font-medium"
+                                className="w-full flex items-center gap-3 px-5 py-3 text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors text-left font-medium"
                             >
-                                <LogoutIcon />
                                 Log out
                             </button>
                         </div>

@@ -1,5 +1,6 @@
 const Column = require('../models/columnModel')
 const Board = require('../models/boardModel')
+const Card = require('../models/cardModel')
 
 const createNewColumn = async (req, res, next) => {
     try {
@@ -50,4 +51,27 @@ const updateColumn = async (req, res, next) => {
     }
 }
 
-module.exports = { createNewColumn, updateColumn }
+const deleteColumn = async (req, res, next) => {
+    try {
+        const columnId = req.params.id
+        const column = Column.findById(columnId)
+
+        if (!column) {
+            res.status(404)
+            throw new Error('Card not found!')
+        }
+
+        await Column.findByIdAndDelete(column)
+
+        await Card.deleteMany({columnId: columnId})
+
+        await Board.findByIdAndDelete(column.boardId, {
+            $pull: { columnOrderIds: columnId }
+        })
+        res.status(200).json({ message: 'Card deleted successfully!' })
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { createNewColumn, updateColumn, deleteColumn }

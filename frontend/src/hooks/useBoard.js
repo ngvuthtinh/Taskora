@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { fetchBoardDetailsAPI, updateBoardAPI, moveCardAPI } from '../services/boardService';
-import { createNewCardAPI } from '../services/cardService';
-import { createNewColumnAPI, updateColumnAPI } from '../services/columnService';
+import { fetchBoardDetailsAPI, updateBoardAPI, moveCardAPI, deleteBoardAPI } from '../services/boardService';
+import { createNewCardAPI, deleteCardAPI } from '../services/cardService';
+import { createNewColumnAPI, updateColumnAPI, deleteColumnAPI } from '../services/columnService';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export const useBoard = (boardId) => {
     const [board, setBoard] = useState(null);
+    const navigate = useNavigate();
 
     /**
      * 1. LOAD BOARD
@@ -188,6 +190,78 @@ export const useBoard = (boardId) => {
         }
     };
 
+    /**
+     * 5. XÓA THẺ (DELETE CARD)
+     */
+    const deleteCardInBoard = async (cardId, columnId) => {
+        try {
+            await deleteCardAPI(cardId);
+            setBoard(prev => ({
+                ...prev,
+                columnOrderIds: prev.columnOrderIds.map(col => {
+                    if (col._id === columnId) {
+                        return {
+                            ...col,
+                            cardOrderIds: col.cardOrderIds.filter(card => card._id !== cardId)
+                        };
+                    }
+                    return col;
+                })
+            }));
+            toast.success('Card deleted successfully!');
+        } catch (error) {
+            toast.error('Failed to delete card');
+        }
+    };
+
+    /**
+     * 6. XÓA CỘT (DELETE COLUMN)
+     */
+    const deleteColumnInBoard = async (columnId) => {
+        if (!window.confirm('Are you sure you want to delete this list and all its cards?')) return;
+        try {
+            await deleteColumnAPI(columnId);
+            setBoard(prev => ({
+                ...prev,
+                columnOrderIds: prev.columnOrderIds.filter(col => col._id !== columnId)
+            }));
+            toast.success('Column deleted successfully!');
+        } catch (error) {
+            toast.error('Failed to delete column');
+        }
+    };
+
+    /**
+     * 7. XÓA BẢNG (DELETE BOARD)
+     */
+    const deleteBoardInProject = async () => {
+        if (!window.confirm('WARNING: Are you sure you want to delete this board? This action cannot be undone!')) return;
+        try {
+            await deleteBoardAPI(boardId);
+            toast.success('Board deleted successfully!');
+            navigate('/');
+        } catch (error) {
+            toast.error('Failed to delete board');
+        }
+    };
+
+    /**
+     * 8. CẬP NHẬT THÔNG TIN BẢNG (UPDATE BOARD DETAILS)
+     */
+    const updateBoardDetails = async (updateData) => {
+        try {
+            const updatedBoard = await updateBoardAPI(boardId, updateData);
+            setBoard(prev => ({
+                ...prev,
+                ...updatedBoard
+            }));
+            return updatedBoard;
+        } catch (error) {
+            toast.error('Failed to update board details');
+            throw error;
+        }
+    };
+
     // Only expose what is needed
     return { 
         board, 
@@ -196,6 +270,10 @@ export const useBoard = (boardId) => {
         updateCardInBoard,
         moveColumn,
         moveCardSameCol,
-        moveCardDiffCol
+        moveCardDiffCol,
+        deleteCardInBoard,
+        deleteColumnInBoard,
+        deleteBoardInProject,
+        updateBoardDetails
     };
 };

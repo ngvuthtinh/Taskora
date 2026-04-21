@@ -107,4 +107,24 @@ const updateBoard = async (req, res, next) => {
     }
 }
 
-module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard, getAllUserBoards }
+const deleteBoard = async (req, res, next) => {
+    try {
+        const boardId = req.params.id
+        const board = findById(boardId)
+
+        if (!board) {
+            res.status(404)
+            throw new Error('Board not found!')
+        }
+
+        await Board.findByIdAndDelete(boardId)
+        await Column.deleteMany({ boardId: boardId })
+        await Card.deleteMany({ boardId: boardId })
+
+        res.status(200).json({ message: 'Board and all its contents deleted successfully!' })
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard, getAllUserBoards, deleteBoard }

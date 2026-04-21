@@ -24,3 +24,9 @@ export const createNewBoardAPI = async (boardData) => {
     const response = await axiosClient.post('/boards/', boardData);
     return response.data;
 };
+
+export const deleteBoardAPI = async (boardId) => {
+    const response = await axiosClient.delete(`/boards/${boardId}`);
+    return response.data;
+};
+

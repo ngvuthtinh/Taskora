@@ -1,12 +1,25 @@
 import Card from '../Card/Card';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 
-const Column = ({ column, boardId, createNewCard, updateCardInBoard, index }) => {
+const Column = ({ column, boardId, createNewCard, updateCardInBoard, deleteCardInBoard, deleteColumnInBoard, index }) => {
     const [openNewCardForm, setOpenNewCardForm] = useState(false)
     const [newCardTitle, setNewCardTitle] = useState('')
+    const [menuOpen, setMenuOpen] = useState(false)
+    const menuRef = useRef(null)
 
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     const addNewCard = async () => {
         if (!newCardTitle.trim()) {
@@ -38,6 +51,30 @@ const Column = ({ column, boardId, createNewCard, updateCardInBoard, index }) =>
                         <h3 className="font-semibold text-slate-700 text-sm tracking-wide">
                             {column.title}
                         </h3>
+                        
+                        <div className="relative" ref={menuRef}>
+                            <button 
+                                onClick={() => setMenuOpen(!menuOpen)}
+                                className="text-slate-400 hover:text-slate-700 p-1 hover:bg-slate-200 rounded transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                            </button>
+
+                            {menuOpen && (
+                                <div className="absolute right-0 mt-1 w-40 bg-white shadow-xl border border-slate-200 rounded-xl py-1 z-10 animate-in fade-in zoom-in duration-100 origin-top-right">
+                                    <button 
+                                        onClick={() => {
+                                            setMenuOpen(false)
+                                            deleteColumnInBoard(column._id)
+                                        }}
+                                        className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2 transition-colors font-medium"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        Delete list
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Card list area */}
@@ -49,7 +86,7 @@ const Column = ({ column, boardId, createNewCard, updateCardInBoard, index }) =>
                                 {...provided.droppableProps}
                             >
                                 {column.cardOrderIds?.map((card, cardIndex) => (
-                                    <Card key={card._id} card={card} index={cardIndex} updateCardInBoard={updateCardInBoard} columnTitle={column.title} />
+                                    <Card key={card._id} card={card} index={cardIndex} updateCardInBoard={updateCardInBoard} deleteCardInBoard={deleteCardInBoard} columnTitle={column.title} />
                                 ))}
                                 {provided.placeholder}
                             </div>

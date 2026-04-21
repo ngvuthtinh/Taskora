@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import Column from '../components/Column/Column';
@@ -9,13 +9,47 @@ const BoardPage = () => {
     const { id: boardId } = useParams();
     const { 
         board, createNewCard, createNewColumn, updateCardInBoard, 
-        moveColumn, moveCardSameCol, moveCardDiffCol 
+        moveColumn, moveCardSameCol, moveCardDiffCol,
+        deleteCardInBoard, deleteColumnInBoard, deleteBoardInProject,
+        updateBoardDetails
     } = useBoard(boardId);
 
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const [newColumnTitle, setNewColumnTitle] = useState('');
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [boardTitle, setBoardTitle] = useState('');
+    const boardMenuRef = useRef(null);
+
     const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm);
 
+    // Sync boardTitle with board object when it loads
+    useEffect(() => {
+        if (board?.title) setBoardTitle(board.title);
+    }, [board?.title]);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (boardMenuRef.current && !boardMenuRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleBoardTitleUpdate = async () => {
+        if (!boardTitle.trim() || boardTitle === board.title) {
+            setBoardTitle(board.title);
+            return;
+        }
+        try {
+            await updateBoardDetails({ title: boardTitle.trim() });
+            toast.success('Board title updated!');
+        } catch (error) {
+            setBoardTitle(board.title);
+        }
+    };
     if (!board) {
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -33,7 +67,7 @@ const BoardPage = () => {
         try {
             await createNewColumn(newColumnTitle);
             setNewColumnTitle('');
-            toggleOpenNewColumnForm();
+            toggleOpenNewCardForm();
         } catch (error) {
             // Error is already shown by Toast inside the Hook
         }
@@ -87,15 +121,84 @@ const BoardPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-            <Navbar
-                showBack
-                title={board.title}
-                badge={board.type === 'private' ? 'Private' : 'Public'}
-            />
+        <div className="h-screen bg-slate-50 flex flex-col font-sans overflow-hidden">
+            {/* Tầng 1: App Bar (Sử dụng Navbar component đã tinh gọn) */}
+            <Navbar />
 
-            {/* Board Content */}
-            <main className="flex-1 p-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
+            {/* Tầng 2: Board Bar (Thông tin riêng của bảng) */}
+            <div className="h-14 px-4 flex items-center justify-between border-b border-slate-200 bg-white/90 backdrop-blur-md shrink-0">
+                <div className="flex items-center gap-4">
+                    <input 
+                        className="text-xl font-extrabold text-slate-800 tracking-tight bg-transparent border-2 border-transparent hover:border-slate-200 focus:border-blue-500 focus:bg-white rounded-lg px-2 py-1 outline-none transition-all cursor-text min-w-[50px]"
+                        style={{ width: `${(boardTitle?.length || 5) + 2}ch` }}
+                        value={boardTitle}
+                        onChange={(e) => setBoardTitle(e.target.value)}
+                        onBlur={handleBoardTitleUpdate}
+                        onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+                        spellCheck={false}
+                    />
+                    
+                    <div className="h-4 w-[1px] bg-slate-300 mx-1"></div>
+                    
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-slate-100 rounded-md transition-colors">
+                        <svg className="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                    </button>
+
+                    <div className="px-2.5 py-1 bg-slate-100/80 text-slate-600 text-xs font-bold rounded-md flex items-center gap-1.5 border border-slate-200/50">
+                        {board.type === 'private' ? (
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        ) : (
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1a2.5 2.5 0 002.5-2.5V11m-12.8 4h1.1a2 2 0 002-2v-1a2 2 0 012-2h2.5"></path></svg>
+                        )}
+                        {board.type.charAt(0).toUpperCase() + board.type.slice(1)}
+                    </div>
+                    
+                    <button className="bg-slate-800 text-white px-3 py-1.5 rounded-md text-xs font-bold shadow-sm hover:bg-slate-900 transition-colors">
+                        Share
+                    </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {/* Member Avatars */}
+                    <div className="flex -space-x-1.5 overflow-hidden">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600">
+                                {String.fromCharCode(64 + i)}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="h-4 w-[1px] bg-slate-300 mx-1"></div>
+
+                    {/* Board Action Menu */}
+                    <div className="relative" ref={boardMenuRef}>
+                        <button 
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            className="flex items-center justify-center w-8 h-8 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                        </button>
+
+                        {menuOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white shadow-xl border border-slate-200 rounded-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150 origin-top-right">
+                                <button 
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        deleteBoardInProject();
+                                    }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors font-semibold"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Delete Board
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Board Content Area */}
+            <main className="flex-1 p-4 overflow-x-auto overflow-y-hidden custom-scrollbar bg-slate-50">
                 <DragDropContext onDragEnd={handleDragEnd}>
                     <Droppable droppableId="board" type="column" direction="horizontal">
                         {(provided) => (
@@ -112,25 +215,27 @@ const BoardPage = () => {
                                         createNewCard={createNewCard}
                                         index={index}
                                         updateCardInBoard={updateCardInBoard}
+                                        deleteCardInBoard={deleteCardInBoard}
+                                        deleteColumnInBoard={deleteColumnInBoard}
                                     />
                                 ))}
                                 {provided.placeholder}
 
-                                {/* Add new column button */}
+                                {/* Thêm cột mới */}
                                 {!openNewColumnForm ? (
                                     <button
                                         onClick={toggleOpenNewColumnForm}
-                                        className="bg-white/50 hover:bg-slate-200/50 text-slate-600 border border-slate-300 border-dashed w-72 shrink-0 p-3 rounded-2xl font-medium flex items-center gap-2 transition-all duration-200"
+                                        className="bg-slate-200/50 hover:bg-slate-200 text-slate-700 border border-slate-300 border-dashed w-72 shrink-0 p-3 rounded-2xl font-semibold flex items-center gap-2 transition-all"
                                     >
-                                        <span className="text-lg leading-none">+</span>
-                                        <span>Add another list</span>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                                        Add another list
                                     </button>
                                 ) : (
-                                    <div className="bg-white p-3 rounded-2xl w-72 shrink-0 flex flex-col border border-slate-200 shadow-sm">
+                                    <div className="bg-slate-100 p-3 rounded-2xl w-72 shrink-0 flex flex-col border border-slate-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
                                         <input
                                             autoFocus
                                             type="text"
-                                            className="p-2 border border-slate-300 focus:border-slate-800 rounded-lg text-sm outline-none transition-colors"
+                                            className="p-2.5 bg-white border border-slate-300 focus:ring-2 focus:ring-slate-800 rounded-xl text-sm outline-none transition-all"
                                             placeholder="Enter list title..."
                                             value={newColumnTitle}
                                             onChange={(e) => setNewColumnTitle(e.target.value)}
@@ -144,15 +249,15 @@ const BoardPage = () => {
                                         <div className="flex items-center gap-2 mt-3">
                                             <button
                                                 onClick={handleCreateNewColumn}
-                                                className="bg-slate-800 hover:bg-slate-900 text-white text-sm py-1.5 px-4 rounded-lg font-medium transition-colors"
+                                                className="bg-slate-800 hover:bg-slate-900 text-white text-sm py-2 px-4 rounded-xl font-bold transition-colors"
                                             >
                                                 Add list
                                             </button>
                                             <button
                                                 onClick={toggleOpenNewColumnForm}
-                                                className="text-slate-400 hover:text-slate-600 font-bold px-2 text-lg"
+                                                className="p-2 text-slate-500 hover:bg-slate-200 rounded-xl transition-colors"
                                             >
-                                                ✕
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                             </button>
                                         </div>
                                     </div>

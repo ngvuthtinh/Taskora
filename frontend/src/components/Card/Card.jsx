@@ -4,7 +4,7 @@ import { Draggable } from '@hello-pangea/dnd';
 import CardDetailModal from './CardDetailModal';
 import { updateCardDetailsAPI } from '../../services/cardService';
 
-const Card = ({ card, updateCardInBoard, columnTitle, index }) => {
+const Card = ({ card, updateCardInBoard, deleteCardInBoard, columnTitle, index }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleToggleComplete = async (e) => {
@@ -75,6 +75,7 @@ const Card = ({ card, updateCardInBoard, columnTitle, index }) => {
                     card={card} 
                     onClose={() => setIsModalOpen(false)} 
                     updateCardInBoard={updateCardInBoard}
+                    deleteCardInBoard={deleteCardInBoard}
                     columnTitle={columnTitle}
                 />
             )}
