@@ -12,7 +12,7 @@ const BoardPage = () => {
         board, createNewCard, createNewColumn, updateCardInBoard, 
         moveColumn, moveCardSameCol, moveCardDiffCol,
         deleteCardInBoard, deleteColumnInBoard, deleteBoardInProject,
-        updateBoardDetails
+        updateBoardDetails, inviteMember, removeMember, updateMemberRole
     } = useBoard(boardId);
 
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
@@ -69,11 +69,13 @@ const BoardPage = () => {
         try {
             await createNewColumn(newColumnTitle);
             setNewColumnTitle('');
-            toggleOpenNewCardForm();
+            toggleOpenNewColumnForm();
         } catch (error) {
             // Error is already shown by Toast inside the Hook
         }
     };
+
+
 
     const handleDragEnd = async (result) => {
         const { destination, source, draggableId, type } = result;
@@ -216,7 +218,7 @@ const BoardPage = () => {
                             >
                                 {board.columnOrderIds?.map((column, index) => (
                                     <Column
-                                        key={column._id}
+                                        key={column._id || `col-${index}`}
                                         column={column}
                                         boardId={board._id}
                                         createNewCard={createNewCard}
@@ -280,6 +282,9 @@ const BoardPage = () => {
                 isOpen={isShareModalOpen} 
                 onClose={() => setIsShareModalOpen(false)} 
                 board={board} 
+                inviteMember={inviteMember}
+                removeMember={removeMember}
+                updateMemberRole={updateMemberRole}
             />
         </div>
     );

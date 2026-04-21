@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { fetchBoardDetailsAPI, updateBoardAPI, moveCardAPI, deleteBoardAPI } from '../services/boardService';
+import { 
+    fetchBoardDetailsAPI, updateBoardAPI, moveCardAPI, deleteBoardAPI,
+    inviteMemberToBoardAPI, removeMemberFromBoardAPI, updateMemberRoleAPI 
+} from '../services/boardService';
 import { createNewCardAPI, deleteCardAPI } from '../services/cardService';
 import { createNewColumnAPI, updateColumnAPI, deleteColumnAPI } from '../services/columnService';
 import { toast } from 'react-toastify';
@@ -262,6 +265,54 @@ export const useBoard = (boardId) => {
         }
     };
 
+    const inviteMember = async (email) => {
+        try {
+            const result = await inviteMemberToBoardAPI(boardId, email);
+            const newBoardData = result.board || result;
+            setBoard(prev => ({
+                ...prev,
+                ownerIds: newBoardData.ownerIds,
+                memberIds: newBoardData.memberIds
+            }));
+            toast.success('Member invited successfully!');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Error inviting member');
+            throw error;
+        }
+    };
+
+    const removeMember = async (email) => {
+        try {
+            const result = await removeMemberFromBoardAPI(boardId, email);
+            const newBoardData = result.board || result;
+            setBoard(prev => ({
+                ...prev,
+                ownerIds: newBoardData.ownerIds,
+                memberIds: newBoardData.memberIds
+            }));
+            toast.success('Member removed successfully!');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Error removing member');
+            throw error;
+        }
+    };
+
+    const updateMemberRole = async (userId, action) => {
+        try {
+            const result = await updateMemberRoleAPI(boardId, userId, action);
+            const newBoardData = result.board || result;
+            setBoard(prev => ({
+                ...prev,
+                ownerIds: newBoardData.ownerIds,
+                memberIds: newBoardData.memberIds
+            }));
+            toast.success('Role updated successfully!');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Error updating role');
+            throw error;
+        }
+    };
+
     // Only expose what is needed
     return { 
         board, 
@@ -274,6 +325,9 @@ export const useBoard = (boardId) => {
         deleteCardInBoard,
         deleteColumnInBoard,
         deleteBoardInProject,
-        updateBoardDetails
+        updateBoardDetails,
+        inviteMember,
+        removeMember,
+        updateMemberRole
     };
 };

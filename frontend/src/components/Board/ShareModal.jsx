@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { inviteMemberToBoardAPI, removeMemberFromBoardAPI, updateMemberRoleAPI } from '../../services/boardService';
 import { toast } from 'react-toastify';
 
-const ShareModal = ({ isOpen, onClose, board }) => {
+const ShareModal = ({ isOpen, onClose, board, inviteMember, removeMember, updateMemberRole }) => {
     const [emailInput, setEmailInput] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState('members');
@@ -33,47 +32,36 @@ const ShareModal = ({ isOpen, onClose, board }) => {
     ];
 
     const handleInvite = async () => {
-        if (!emailInput.trim()) {
-            toast.warning('Please enter an email address!');
-            return;
-        }
+        if (!emailInput.trim()) return;
         try {
             setIsSubmitting(true);
-            await inviteMemberToBoardAPI(board._id, emailInput.trim());
-            toast.success('Done!');
+            await inviteMember(emailInput.trim());
             setEmailInput('');
-            window.location.reload();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Error');
+            // Error handling is inside the hook
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleRemoveMember = async (userId, userEmail, userName) => {
+    const handleRemoveMemberAction = async (userId, userEmail, userName) => {
         const isSelf = userId === currentUser?._id;
         const msg = isSelf ? 'Are you sure you want to leave this board?' : `Remove ${userName}?`;
         if (!window.confirm(msg)) return;
         try {
-            // Using DELETE with body to match backend
-            await removeMemberFromBoardAPI(board._id, userEmail);
-            toast.success(isSelf ? 'You left the board' : 'Removed');
-            window.location.reload();
+            await removeMember(userEmail);
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Error');
+            // Error handling is inside the hook
         }
     };
 
-    const handleChangeRole = async (userId, newRole) => {
+    const handleChangeRoleAction = async (userId, newRole) => {
         try {
-            // Convert role to action for backend logic
             const action = newRole === 'admin' ? 'promote' : 'demote';
-            await updateMemberRoleAPI(board._id, userId, action);
-            toast.success('Role updated');
+            await updateMemberRole(userId, action);
             setOpenMenuId(null);
-            window.location.reload();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update role');
+            // Error handling is inside the hook
         }
     };
 
@@ -176,11 +164,11 @@ const ShareModal = ({ isOpen, onClose, board }) => {
                                             <div ref={menuRef} className="absolute right-0 top-full mt-2 w-[280px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-slate-100 rounded-2xl py-3 z-[300] animate-in fade-in slide-in-from-top-2">
                                                 {canCurrentAdminManage && (
                                                     <>
-                                                        <div onClick={() => handleChangeRole(person._id, 'admin')} className={`px-4 py-2.5 hover:bg-slate-50 cursor-pointer ${person.role === 'admin' ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}>
+                                                        <div onClick={() => handleChangeRoleAction(person._id, 'admin')} className={`px-4 py-2.5 hover:bg-slate-50 cursor-pointer ${person.role === 'admin' ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}>
                                                             <p className={`text-sm font-bold ${person.role === 'admin' ? 'text-blue-600' : 'text-slate-800'}`}>Admin</p>
                                                             <p className="text-[11px] text-slate-500 mt-1 leading-normal">Full control. Can add members, change settings, and delete the board.</p>
                                                         </div>
-                                                        <div onClick={() => handleChangeRole(person._id, 'member')} className={`px-4 py-2.5 hover:bg-slate-50 cursor-pointer ${person.role === 'member' ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}>
+                                                        <div onClick={() => handleChangeRoleAction(person._id, 'member')} className={`px-4 py-2.5 hover:bg-slate-50 cursor-pointer ${person.role === 'member' ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}>
                                                             <p className={`text-sm font-bold ${person.role === 'member' ? 'text-blue-600' : 'text-slate-800'}`}>Member</p>
                                                             <p className="text-[11px] text-slate-500 mt-1 leading-normal">Can join boards and edit cards, but cannot change board settings.</p>
                                                         </div>
@@ -189,7 +177,7 @@ const ShareModal = ({ isOpen, onClose, board }) => {
                                                 )}
                                                 
                                                 <button 
-                                                    onClick={() => handleRemoveMember(person._id, person.email, person.name || person.email)}
+                                                    onClick={() => handleRemoveMemberAction(person._id, person.email, person.name || person.email)}
                                                     className="w-full text-left px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
                                                 >
                                                     {isSelf ? 'Leave board...' : 'Remove from board'}
