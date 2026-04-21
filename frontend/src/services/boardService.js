@@ -30,3 +30,18 @@ export const deleteBoardAPI = async (boardId) => {
     return response.data;
 };
 
+export const inviteMemberToBoardAPI = async (boardId, email) => {
+    const response = await axiosClient.post(`/boards/${boardId}/members`, { email });
+    return response.data;
+};
+
+export const removeMemberFromBoardAPI = async (boardId, email) => {
+    const response = await axiosClient.delete(`/boards/${boardId}/members`, { data: { email } });
+    return response.data;
+};
+
+export const updateMemberRoleAPI = async (boardId, userId, action) => {
+    const response = await axiosClient.put(`/boards/${boardId}/members/role`, { userId, action });
+    return response.data;
+};
+

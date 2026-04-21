@@ -191,4 +191,153 @@ const addMemberToBoard = async (req, res, next) => {
     }
 }
 
-module.exports = { createNewBoard, getBoardDetails, moveCardToDifferentColumn, updateBoard, getAllUserBoards, deleteBoard, addMemberToBoard }
+const removeMemberFromBoard = async (req, res, next) => {
+    try {
+        const { email } = req.body
+        const boardId = req.params.id
+
+        const user = await User.findOne({ email })
+
+        if (!user) {
+            res.status(404)
+            throw new Error('User does not exist')
+        }
+
+        const board = await Board.findById(boardId)
+
+        if (!board) {
+            res.status(404)
+            throw new Error('Board does not exist')
+        }
+
+        const userIdString = user._id.toString() // who got kick
+        const requesterId = req.user._id.toString(); // who kick
+        const isRequesterAdmin = board.ownerIds.some(id => id.toString() === requesterId);
+        const isRemovingSelf = requesterId === userIdString;
+        const isUserAdmin = board.ownerIds.some(id => id.toString() === userIdString);
+
+        if (!isRemovingSelf && !isRequesterAdmin) {
+            res.status(403)
+            throw new Error('Error')
+        }
+
+        if (isUserAdmin && board.ownerIds.length === 1) {
+            res.status(403)
+            throw new Error('Cannot remove the last Admin!')
+        }
+
+        const updatedBoard = await Board.findByIdAndUpdate(boardId,
+            {
+                $pull: {
+                    ownerIds: user._id,
+                    memberIds: user._id
+                }
+            },
+            { returnDocument: 'after' }
+        ).populate('ownerIds memberIds', 'name email')
+
+        await Card.updateMany(
+            { boardId: boardId },
+            { $pull: { memberIds: user._id } }
+        )
+
+        res.status(200).json({ message: 'Member removed successfully!', board: updatedBoard });
+    } catch (error) {
+        next(error);
+    }
+}
+
+const updateMemberRole = async (req, res, next) => {
+    try {
+        const { userId, email, action } = req.body
+        let targetUserId = userId
+        const boardId = req.params.id
+
+        if (email) {
+            const user = await User.findOne({ email })
+            if (!user) {
+                res.status(404)
+                throw new Error('User with this email does not exist!')
+            }
+            targetUserId = user._id
+        }
+
+        if (!targetUserId) {
+            res.status(400)
+            throw new Error('Please provide either userId or email.')
+        }
+
+        const board = await Board.findById(boardId)
+
+        if (!board) {
+            res.status(404)
+            throw new Error('Board does not exist')
+        }
+
+        const isRequesterAdmin = board.ownerIds.some(id => id.toString() === req.user._id.toString());
+        const isTargetAdmin = board.ownerIds.some(id => id.toString() === targetUserId.toString());
+
+        if (!isRequesterAdmin) {
+            res.status(403)
+            throw new Error('Only Admin can update roles!')
+        }
+
+        let updateData = {}
+        if (action === 'promote') {
+            updateData = {
+                $addToSet: { ownerIds: targetUserId },
+                $pull: { memberIds: targetUserId }
+            }
+        } else if (action === 'demote') {
+            if (!isTargetAdmin) {
+                res.status(403)
+                throw new Error('User is not an Admin!')
+            }
+
+            if (board.ownerIds.length === 1) {
+                res.status(403)
+                throw new Error('Cannot demote the last Admin!')
+            }
+
+            updateData = {
+                $addToSet: { memberIds: targetUserId },
+                $pull: { ownerIds: targetUserId }
+            }
+        } else {
+            res.status(400)
+            throw new Error('Invalid action! Only "promote" or "demote" are accepted.')
+        }
+
+
+
+        const updateRole = await Board.findByIdAndUpdate(
+            boardId,
+            updateData,
+            { returnDocument: 'after' }
+        ).populate(
+            'ownerIds memberIds', 'name email'
+        )
+
+        if (!updateRole) {
+            res.status(404)
+            throw new Error('Can not update Role!')
+        }
+
+        res.status(200).json({ message: 'Member Role updated successfully!', board: updateRole })
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = {
+    createNewBoard,
+    getBoardDetails,
+    moveCardToDifferentColumn,
+    updateBoard,
+    getAllUserBoards,
+    deleteBoard,
+    addMemberToBoard,
+    removeMemberFromBoard,
+    updateMemberRole
+}

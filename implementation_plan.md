@@ -26,8 +26,8 @@ Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Cl
 - [ ] Quản lý Shared Link: Logic tạo/hủy link mời duy nhất (Unique Shareable Link).
 - [ ] Phê duyệt tham gia (Join Requests): Xử lý Danh sách chờ - Đồng ý/Từ chối người xin vào bảng.
 - [x] Gán việc (Assign to Card): Giao member vào từng Card cụ thể.
-- [ ] **[BACKEND] Quản lý Role**: Viết API thăng hạng Admin/Member.
-- [ ] **[BACKEND] Member Removal**: Viết logic xóa người khỏi board & rời bảng an toàn.
+- [x] **[BACKEND] Quản lý Role**: Viết API thăng hạng Admin/Member.
+- [x] **[BACKEND] Member Removal**: Viết logic xóa người khỏi board & rời bảng an toàn.
 - [ ] Push Notification (Email): Gửi mail báo khi được mời vào Board/Card. 
 
 ## 🏗️ Sprint 4: Cá nhân hóa tài khoản (User Settings)

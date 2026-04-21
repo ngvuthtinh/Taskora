@@ -77,11 +77,13 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
     }
 
     return (
-        <div className="fixed inset-0 z-[160] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" onClick={onClose}>
-            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[160] overflow-y-auto bg-slate-900/40 backdrop-blur-sm" onClick={onClose}>
+            {/* Centering Wrapper */}
+            <div className="min-h-full flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl relative my-8 flex flex-col animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
                 
                 {/* Header */}
-                <div className="px-8 pt-8 pb-4 flex justify-between items-start shrink-0">
+                <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 flex justify-between items-start shrink-0 sticky top-0 bg-white z-[60] rounded-t-2xl border-b border-transparent">
                     <div className="flex-1 pr-10">
                         <input
                             type="text"
@@ -112,7 +114,7 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-8 pb-8 space-y-8">
+                <div className="px-5 sm:px-8 pb-8 space-y-8 mt-4">
                     
                     {/* Labels */}
                     <div className="space-y-3">
@@ -199,7 +201,7 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                                 </button>
 
                                 {assignMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-1 w-full min-w-[220px] bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-slate-100 rounded-xl py-2 z-[200] animate-in fade-in slide-in-from-top-1 duration-150">
+                                    <div className="absolute top-0 left-0 w-full min-w-[220px] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-100 rounded-xl py-2 z-[200] animate-in fade-in zoom-in-95 duration-150 origin-top-left">
                                         <p className="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wide">Board members</p>
                                         <div className="max-h-[180px] overflow-y-auto custom-scrollbar">
                                             {boardMembers.map(member => {
@@ -238,9 +240,10 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                 </div>
 
                 {/* Footer */}
-                <div className="p-8 bg-slate-50 flex justify-end gap-3 mt-auto shrink-0">
+                <div className="p-5 sm:p-8 bg-slate-50 flex flex-wrap justify-end gap-3 mt-auto shrink-0 sticky bottom-0 z-[60] rounded-b-2xl border-t border-slate-100">
                     <button onClick={onClose} className="px-5 py-2.5 text-slate-500 hover:text-slate-800 rounded-lg text-sm font-semibold transition-all">Cancel</button>
                     <button onClick={handleSave} className="px-8 py-2.5 bg-slate-800 hover:bg-black text-white rounded-xl text-sm font-bold shadow-md transition-all active:scale-95">Save Changes</button>
+                </div>
                 </div>
             </div>
         </div>
