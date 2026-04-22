@@ -35,7 +35,11 @@ const cardSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 
     default: []
-  }]
+  }],
+  deadlineNotified: {
+    type: Boolean,
+    default: false
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Card', cardSchema)

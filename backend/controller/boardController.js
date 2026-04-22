@@ -2,6 +2,7 @@ const Board = require('../models/boardModel')
 const Column = require('../models/columnModel')
 const Card = require('../models/cardModel')
 const User = require('../models/userModel')
+const { createNotification } = require('../utils/notificationHelper')
 
 const getAllUserBoards = async (req, res, next) => {
     try {
@@ -48,15 +49,15 @@ const getBoardDetails = async (req, res, next) => {
         const boardId = req.params.id
 
         const board = await Board.findById(boardId)
-            .populate('ownerIds', 'name email username')
-            .populate('memberIds', 'name email username')
+            .populate('ownerIds', 'name email username avatar')
+            .populate('memberIds', 'name email username avatar')
             .populate({
                 path: 'columnOrderIds',
                 populate: {
                     path: 'cardOrderIds',
                     populate: {
                         path: 'memberIds',
-                        select: 'name email'
+                        select: 'name email avatar'
                     }
                 }
             })
@@ -185,6 +186,17 @@ const addMemberToBoard = async (req, res, next) => {
         board.memberIds.push(user._id)
 
         await board.save()
+        
+        // Gửi thông báo cho người được mời
+        await createNotification(
+            user._id, 
+            req.user._id, 
+            'BOARD_INVITATION', 
+            'New Board Invitation', 
+            `You have been invited to join the board: "${board.title}"`,
+            board._id
+        );
+
         res.status(200).json({ message: 'Member added successfully!', board });
     } catch (error) {
         next(error);
@@ -234,7 +246,7 @@ const removeMemberFromBoard = async (req, res, next) => {
                 }
             },
             { returnDocument: 'after' }
-        ).populate('ownerIds memberIds', 'name email')
+        ).populate('ownerIds memberIds', 'name email avatar')
 
         await Card.updateMany(
             { boardId: boardId },

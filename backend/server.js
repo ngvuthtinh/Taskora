@@ -7,13 +7,18 @@ const boardRoutes = require('./routes/boardRoutes')
 const columnRoutes = require('./routes/columnRoutes')
 const cardRoutes = require('./routes/cardRoutes')
 const userRoutes = require('./routes/userRoutes')
+const notificationRoutes = require('./routes/notificationRoutes')
 const { errorHandler } = require('./middlewares/errorMiddleware')
+const { initCronJobs } = require('./utils/cronJobs')
 
 
 const app = express();
 
 // Connect DB
 connectDB();
+
+// Start Background Tasks
+initCronJobs();
 
 app.use(cors({
   origin: 'http://localhost:5173', // Chỉ ông này được gọi, mấy ông khác cấm
@@ -29,6 +34,7 @@ app.use('/api/boards', boardRoutes)
 app.use('/api/columns', columnRoutes)
 app.use('/api/cards', cardRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/notifications', notificationRoutes)
 
 app.use(errorHandler);
 

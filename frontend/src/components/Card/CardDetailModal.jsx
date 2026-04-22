@@ -182,8 +182,12 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                             <div className="flex flex-col gap-2 max-h-[140px] overflow-y-auto custom-scrollbar pr-1 mb-2">
                                 {card.memberIds?.map((member) => (
                                     <div key={member._id} className="flex items-center gap-2.5 p-2 bg-slate-50 dark:bg-slate-800 border border-slate-50 dark:border-slate-800 rounded-xl group hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
-                                        <div className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white text-[10px] shrink-0">
-                                            {(member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()}
+                                        <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-500 text-[10px] shrink-0 overflow-hidden border border-slate-100 dark:border-slate-800">
+                                            {member.avatar ? (
+                                                <img src={member.avatar} alt="avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                            ) : (
+                                                (member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()
+                                            )}
                                         </div>
                                         <span className="text-xs font-medium text-slate-700 dark:text-slate-200 truncate flex-1">{member.name || member.email}</span>
                                         <button onClick={() => handleToggleMember(member._id)} className="text-slate-300 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-0.5"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -208,8 +212,12 @@ const CardDetailModal = ({ card, onClose, updateCardInBoard, deleteCardInBoard, 
                                                 const isAssigned = card.memberIds?.some(m => m._id === member._id);
                                                 return (
                                                     <button key={member._id} onClick={() => handleToggleMember(member._id)} className={`w-full flex items-center gap-3 px-3 py-1.5 transition-colors ${isAssigned ? 'dark:bg-slate-800/50' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[9px] ${isAssigned ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
-                                                            {(member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()}
+                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[9px] overflow-hidden border ${isAssigned ? 'bg-blue-100 border-blue-200 text-blue-600 shadow-sm' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                                                            {member.avatar ? (
+                                                                <img src={member.avatar} alt="avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                            ) : (
+                                                                (member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()
+                                                            )}
                                                         </div>
                                                         <span className={`text-xs font-medium flex-1 truncate ${isAssigned ? 'text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300'}`}>{member.name || member.email}</span>
                                                         {isAssigned && <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path></svg>}

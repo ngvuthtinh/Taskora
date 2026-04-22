@@ -1,6 +1,7 @@
 const Card = require('../models/cardModel')
 const Column = require('../models/columnModel')
 const User = require('../models/userModel')
+const { createNotification } = require('../utils/notificationHelper')
 
 const createNewCard = async (req, res, next) => {
     try {
@@ -40,7 +41,7 @@ const updateCard = async (req, res, next) => {
             req.params.id,
             updateData,
             { returnDocument: 'after' }
-        ).populate('memberIds', 'name email')
+        ).populate('memberIds', 'name email avatar')
 
         if (!card) {
             res.status(404)
@@ -85,11 +86,24 @@ const assignMemberToCard = async (req, res, next) => {
             throw new Error('Invalid action! Only "add" or "remove" are accepted.')
         }
 
-        const updatedCard = await Card.findByIdAndUpdate(cardId, updateData, { returnDocument: 'after' }).populate('memberIds', 'name email')
+        const updatedCard = await Card.findByIdAndUpdate(cardId, updateData, { returnDocument: 'after' }).populate('memberIds', 'name email avatar')
 
         if (!updatedCard) {
             res.status(404)
             throw new Error('Card not found!')
+        }
+
+        // Gửi thông báo nếu là thêm mới người vào card
+        if (action === 'add') {
+            await createNotification(
+                targetUserId,
+                req.user._id,
+                'TASK_ASSIGNMENT',
+                'New Task Assigned',
+                `You have been assigned to the task: "${updatedCard.title}"`,
+                updatedCard.boardId, // relatedId là Board ID
+                updatedCard._id      // cardId là Card ID
+            );
         }
 
         res.status(200).json({ message: 'Member updated successfully!', card: updatedCard })

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createNewBoardAPI } from '../../services/boardService';
+import { getMyNotificationsAPI, markNotificationAsReadAPI } from '../../services/notificationService';
 import { toast } from 'react-toastify';
 
 // Icons
@@ -40,10 +41,19 @@ const ThemeIcon = ({ isDark }) => (
     )
 );
 
+const BellIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+);
+
 const Navbar = () => {
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [notifOpen, setNotifOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
     const dropdownRef = useRef(null);
+    const notifRef = useRef(null);
 
     const [user, setUser] = useState(() => {
         try {
@@ -107,10 +117,62 @@ const Navbar = () => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setDropdownOpen(false);
             }
+            if (notifRef.current && !notifRef.current.contains(e.target)) {
+                setNotifOpen(false);
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const data = await getMyNotificationsAPI();
+            setNotifications(data);
+        } catch (error) {
+            console.error('Failed to fetch notifications', error);
+        }
+    };
+
+    useEffect(() => {
+        if (user) {
+            fetchNotifications();
+            // Polling mỗi 30 giây để giả lập real-time (tạm thời khi chưa có Socket.io)
+            const interval = setInterval(fetchNotifications, 30000);
+            return () => clearInterval(interval);
+        }
+    }, [user]);
+
+    const handleMarkAsRead = async (id) => {
+        try {
+            await markNotificationAsReadAPI(id);
+            setNotifications(prev => 
+                id === 'all' 
+                ? prev.map(n => ({ ...n, isRead: true }))
+                : prev.map(n => n._id === id ? { ...n, isRead: true } : n)
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const formatTime = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+        
+        if (diffInSeconds < 60) return 'just now';
+        
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+        
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) return `${diffInHours}h ago`;
+        
+        return date.toLocaleDateString();
+    };
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -155,11 +217,95 @@ const Navbar = () => {
                     
                     <button
                         onClick={toggleTheme}
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors mr-1"
+                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
                         aria-label="Toggle theme"
                     >
                         <ThemeIcon isDark={isDarkMode} />
                     </button>
+
+                    {/* Notifications Bell */}
+                    <div className="relative" ref={notifRef}>
+                        <button
+                            onClick={() => setNotifOpen(!notifOpen)}
+                            className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors relative ${notifOpen ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'}`}
+                        >
+                            <BellIcon />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse"></span>
+                            )}
+                        </button>
+
+                        {notifOpen && (
+                            <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                    <h4 className="text-sm font-bold text-slate-800 dark:text-white">Notifications</h4>
+                                    {unreadCount > 0 && (
+                                        <button 
+                                            onClick={() => handleMarkAsRead('all')}
+                                            className="text-[10px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-md uppercase tracking-wider transition-colors"
+                                        >
+                                            Mark all read
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="max-h-96 overflow-y-auto">
+                                    {notifications.length > 0 ? (
+                                        notifications.map((notif) => (
+                                            <div 
+                                                key={notif._id}
+                                                onClick={() => {
+                                                    handleMarkAsRead(notif._id);
+                                                    if (notif.type === 'BOARD_INVITATION') {
+                                                        navigate(`/board/${notif.relatedId}`);
+                                                    } else if (notif.type === 'TASK_ASSIGNMENT') {
+                                                        navigate(`/board/${notif.relatedId}?cardId=${notif.cardId}`);
+                                                    }
+                                                    setNotifOpen(false);
+                                                }}
+                                                className={`px-4 py-4 border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 cursor-pointer transition-colors relative ${!notif.isRead ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}
+                                            >
+                                                {!notif.isRead && (
+                                                    <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-3 bg-blue-600 rounded-full"></div>
+                                                )}
+                                                <div className="flex gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800">
+                                                        {notif.sender?.avatar ? (
+                                                            <img src={notif.sender.avatar} alt="sender" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                                                {(notif.sender?.name || notif.sender?.username || 'U')[0].toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-0.5">{notif.title}</p>
+                                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">{notif.message}</p>
+                                                        <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-2 block font-medium uppercase tracking-tighter">
+                                                            {formatTime(notif.createdAt)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-8 text-center">
+                                            <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                <BellIcon />
+                                            </div>
+                                            <p className="text-xs text-slate-400 font-medium">No notifications yet</p>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="p-2 bg-slate-50 dark:bg-slate-800/50 text-center">
+                                    <button className="text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">
+                                        View all
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     <button
                         id="navbar-avatar-btn"

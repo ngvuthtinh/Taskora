@@ -102,31 +102,10 @@ const ShareModal = ({ isOpen, onClose, board, inviteMember, removeMember, update
                         </button>
                     </div>
 
-                    {/* Shared Link Area */}
-                    <div className="flex items-center gap-4 p-4 bg-slate-50/50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                        <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
-                            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-sm font-bold text-slate-800 dark:text-white">Anyone with the link can join as a member</p>
-                            <div className="flex gap-3 text-xs mt-1">
-                                <button className="text-blue-600 dark:text-blue-400 font-bold hover:underline">Copy link</button>
-                                <span className="text-slate-200 dark:text-slate-700">•</span>
-                                <button className="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors">Delete link</button>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Tabs */}
-                    <div className="flex gap-6 border-b border-slate-100 dark:border-slate-800 -mx-1 overflow-x-auto no-scrollbar">
-                        <button onClick={() => setActiveTab('members')} className={`pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${activeTab === 'members' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                            Board members <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full text-[10px] ml-1">{allPeople.length}</span>
-                            {activeTab === 'members' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
-                        </button>
-                        <button onClick={() => setActiveTab('requests')} className={`pb-3 text-sm font-bold transition-all relative ${activeTab === 'requests' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                            Join requests
-                            {activeTab === 'requests' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
-                        </button>
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                         <h3 className="text-sm font-bold text-slate-800 dark:text-white">Board members</h3>
+                         <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2.5 py-1 rounded-full text-[10px] font-black">{allPeople.length}</span>
                     </div>
 
                     {/* Member List - No internal scroll to allow overflow popups */}
@@ -139,8 +118,12 @@ const ShareModal = ({ isOpen, onClose, board, inviteMember, removeMember, update
 
                             return (
                                 <div key={person._id} className="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl group transition-all relative">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-xs shrink-0 ${person.role === 'admin' ? 'bg-orange-500' : 'bg-slate-800 dark:bg-slate-700'}`}>
-                                        {(person.name ? person.name.charAt(0) : person.email.charAt(0)).toUpperCase()}
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-xs shrink-0 overflow-hidden border-2 ${person.role === 'admin' ? 'bg-orange-500 border-orange-200' : 'bg-slate-800 dark:bg-slate-700 border-slate-600'}`}>
+                                        {person.avatar ? (
+                                            <img src={person.avatar} alt="avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                        ) : (
+                                            (person.name ? person.name.charAt(0) : person.email.charAt(0)).toUpperCase()
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-bold text-slate-800 dark:text-white truncate flex items-center gap-2">

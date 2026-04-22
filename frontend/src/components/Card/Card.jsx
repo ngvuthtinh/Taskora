@@ -1,11 +1,23 @@
-// src/components/Card/Card.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Draggable } from '@hello-pangea/dnd';
 import CardDetailModal from './CardDetailModal';
 import { updateCardDetailsAPI } from '../../services/cardService';
 
 const Card = ({ card, updateCardInBoard, deleteCardInBoard, columnTitle, index, boardMembers }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Tự động mở Modal nếu có cardId trên URL
+    useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const cardIdFromUrl = queryParams.get('cardId');
+        if (cardIdFromUrl === card._id) {
+            setIsModalOpen(true);
+            
+            // Xóa cardId khỏi URL sau khi đã mở để tránh việc F5 lại tự mở tiếp (tùy chọn)
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+        }
+    }, [card._id]);
 
     const handleToggleComplete = async (e) => {
         e.stopPropagation();
@@ -60,10 +72,18 @@ const Card = ({ card, updateCardInBoard, deleteCardInBoard, columnTitle, index, 
                 )}
 
                 {card.memberIds?.length > 0 && (
-                    <div className="mt-3 flex -space-x-2 overflow-hidden">
+                    <div className="mt-3 flex -space-x-2 items-center">
                         {card.memberIds.map((member, idx) => (
-                            <div key={idx} title={member.name || member.email} className="inline-block w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                                {(member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()}
+                            <div 
+                                key={idx} 
+                                title={member.name || member.email} 
+                                className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[9px] font-bold text-slate-600 dark:text-slate-300 overflow-hidden shrink-0 shadow-sm"
+                            >
+                                {member.avatar ? (
+                                    <img src={member.avatar} alt="member" className="w-full h-full object-cover" />
+                                ) : (
+                                    (member.name ? member.name.charAt(0) : (member.email ? member.email.charAt(0) : '?')).toUpperCase()
+                                )}
                             </div>
                         ))}
                     </div>
