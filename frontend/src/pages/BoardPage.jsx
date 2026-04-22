@@ -193,8 +193,17 @@ const BoardPage = () => {
                                 key={member._id || idx} 
                                 className="group relative"
                             >
-                                <div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0 cursor-pointer group-hover:scale-110 group-hover:z-10 transition-all">
-                                    {(member.name ? member.name.charAt(0) : member.email.charAt(0)).toUpperCase()}
+                                <div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0 cursor-pointer group-hover:scale-110 group-hover:z-10 transition-all overflow-hidden">
+                                    {member.avatar ? (
+                                        <img
+                                            src={member.avatar}
+                                            alt={member.name || member.email || 'member avatar'}
+                                            className="w-full h-full object-cover"
+                                            referrerPolicy="no-referrer"
+                                        />
+                                    ) : (
+                                        (member.name?.charAt(0) || member.email?.charAt(0) || '?').toUpperCase()
+                                    )}
                                 </div>
                                 {/* Custom Tooltip - Positioned BELOW avatar */}
                                 <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-[100]">
