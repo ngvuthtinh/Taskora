@@ -69,7 +69,7 @@ const getBoardDetails = async (req, res, next) => {
         }
 
         const userIdString = req.user._id.toString()
-        // Vì lúc nãy ta đã gọi .populate('ownerIds memberIds'), nên bây giờ các mảng này chứa cục { _id, name, email } chứ không còn là một cái String ID trọc nữa, do đó phải bốc cái userObj._id ra để đọ:
+        // Since we populated 'ownerIds memberIds', these arrays now contain user objects { _id, name, email }, not just string IDs:
         const isOwner = board.ownerIds.some(userObj => userObj._id.toString() === userIdString)
         const isMember = board.memberIds.some(userObj => userObj._id.toString() === userIdString)
 
@@ -93,7 +93,7 @@ const moveCardToDifferentColumn = async (req, res, next) => {
 
         await Promise.all([updatePrevColumn, updateNextColumn, updateCard])
 
-        // Phát tín hiệu Real-time cho mọi người trong Board
+        // Broadcast real-time update to everyone in the board
         const io = req.app.get('socketio');
         io.to(boardId).emit('api_update_board', { message: 'Card moved!' });
 
@@ -127,7 +127,7 @@ const updateBoard = async (req, res, next) => {
 
         res.status(200).json({ message: 'Board updated successfully!', board: updatedBoard })
         
-        // Real-time: Thông báo bảng đã cập nhật
+        // Real-time: Notify that board layout changed
         const io = req.app.get('socketio');
         io.to(boardId).emit('api_update_board', { message: 'Board layout changed!' });
     } catch (error) {

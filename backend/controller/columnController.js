@@ -19,7 +19,7 @@ const createNewColumn = async (req, res, next) => {
             { returnDocument: 'after' }
         )
 
-        // Real-time
+        // Real-time notification
         const io = req.app.get('socketio');
         io.to(boardId.toString()).emit('api_update_board', { message: 'Column created' });
 
@@ -49,7 +49,7 @@ const updateColumn = async (req, res, next) => {
             throw new Error('Column not found!')
         }
 
-        // Real-time
+        // Real-time notification
         const io = req.app.get('socketio');
         io.to(updatedColumn.boardId.toString()).emit('api_update_board', { message: 'Column updated' });
 
@@ -76,7 +76,7 @@ const deleteColumn = async (req, res, next) => {
         await Board.findByIdAndUpdate(column.boardId, {
             $pull: { columnOrderIds: columnId }
         })
-        // Real-time
+        // Real-time notification
         const io = req.app.get('socketio');
         io.to(column.boardId.toString()).emit('api_update_board', { message: 'Column deleted' });
 

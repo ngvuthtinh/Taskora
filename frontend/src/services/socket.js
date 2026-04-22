@@ -1,12 +1,12 @@
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:8000'; // URL của Backend
+const SOCKET_URL = 'http://localhost:8000'; // Backend URL
 
 export const socket = io(SOCKET_URL, {
-    autoConnect: false // Chỉ kết nối khi cần thiết (đã đăng nhập)
+    autoConnect: false // Connect only when needed (after login)
 });
 
-// Hàm hỗ trợ join phòng
+// Helper to join a room
 export const joinBoardRoom = (boardId) => {
     if (socket.connected) {
         socket.emit('joinBoard', boardId);
@@ -18,7 +18,7 @@ export const joinBoardRoom = (boardId) => {
     }
 };
 
-// Hàm hỗ trợ rời phòng
+// Helper to leave a room
 export const leaveBoardRoom = (boardId) => {
     socket.emit('leaveBoard', boardId);
 };

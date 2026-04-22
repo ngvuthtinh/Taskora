@@ -6,14 +6,14 @@ import { updateCardDetailsAPI } from '../../services/cardService';
 const Card = ({ card, updateCardInBoard, deleteCardInBoard, columnTitle, index, boardMembers }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Tự động mở Modal nếu có cardId trên URL
+    // Automatically open Modal if cardId is present in URL
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
         const cardIdFromUrl = queryParams.get('cardId');
         if (cardIdFromUrl === card._id) {
             setIsModalOpen(true);
             
-            // Xóa cardId khỏi URL sau khi đã mở để tránh việc F5 lại tự mở tiếp (tùy chọn)
+            // Clear cardId from URL after opening to prevent re-opening on manual refresh
             const newUrl = window.location.pathname;
             window.history.replaceState({}, '', newUrl);
         }

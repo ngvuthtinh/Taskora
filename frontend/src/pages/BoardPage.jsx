@@ -22,10 +22,10 @@ const BoardPage = () => {
         if (boardId) {
             joinBoardRoom(boardId);
 
-            // Lắng nghe sự kiện cập nhật từ Backend
+            // Listen for update events from Backend
             socket.on('api_update_board', (data) => {
                 console.log('Real-time sync:', data.message);
-                refreshBoard(); // Tự động load lại dữ liệu
+                refreshBoard(); // Auto-reload data
             });
 
             return () => {

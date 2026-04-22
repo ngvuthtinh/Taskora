@@ -14,9 +14,8 @@ export const useBoard = (boardId) => {
 
     /**
      * 1. LOAD BOARD
-     * Chạy ngay khi mở Web lên. 
-     * Nó gọi API fetchBoardDetailsAPI lấy toàn bộ cấu trúc Bảng (Cột, Thẻ)
-     * và nhét vào kho lưu trữ (state 'board').
+     * Fetches the board structure (Columns, Cards) from the API 
+     * and updates the local 'board' state.
      */
     const loadBoard = async () => {
         try {
@@ -34,10 +33,10 @@ export const useBoard = (boardId) => {
     }, [boardId]);
 
     /**
-     * 2. TẠO THẺ MỚI (CREATE NEW CARD)
-     * B1: Gọi API createNewCardAPI đẩy dữ liệu lên server.
-     * B2: Sau khi server đồng ý, chọc thẳng vào State Local để nhét thẻ mới
-     * vào đuôi danh sách thẻ của cái Cột chứa nó, nhờ đó giao diện cập nhật ngay.
+     * 2. CREATE NEW CARD
+     * B1: Calls API to save the new card on the server.
+     * B2: Updates local state by pushing the new card 
+     * into the specific column's card list.
      */
     const createNewCard = async (newCardData) => {
         try {
@@ -51,9 +50,8 @@ export const useBoard = (boardId) => {
                     // Nếu id của cột ĐÚNG BẰNG id của cột chứa tấm thẻ mới tạo
                     if (col._id === createdCard.columnId) {
                         return {
-                            ...col, // Copy toàn bộ thông tin cũ của Cột này (title, id...)
-                            // Tạo mảng thẻ mới = [...Lấy tất cả thẻ cũ của cột] + Nhét [thẻ mới] vào đuôi
-                            // (Hoặc nếu cột rỗng chưa có thẻ nào thì cho mảng rỗng [])
+                            ...col, // Copy original column data
+                            // New card list = [...Old cards] + [New card]
                             cardOrderIds: [...(col.cardOrderIds || []), createdCard]
                         };
                     }
@@ -69,9 +67,9 @@ export const useBoard = (boardId) => {
     };
 
     /**
-     * 3. TẠO CỘT MỚI (CREATE NEW COLUMN)
-     * Tương tự tạo thẻ, gọi API trước. Rồi âm thầm cập nhật State bằng cách
-     * chèn cột mới (createdColumn) vào đằng sau cùng danh sách cột.
+     * 3. CREATE NEW COLUMN
+     * Similar to creating a card, calls API first, 
+     * then updates local state by appending the new column.
      */
     const createNewColumn = async (newColumnTitle) => {
         try {
@@ -97,9 +95,9 @@ export const useBoard = (boardId) => {
     };
 
     /**
-     * 4. CẬP NHẬT GIAO DIỆN LOCAL (KHÔNG GỌI API)
-     * Nhiệm vụ duy nhất là tráo đổi dữ liệu Thẻ cũ thành Thẻ mới nằm sâu trong State
-     * Dùng cho Kéo Thả (Drag & Drop) hoặc cập nhật mượt mà khi đổi tên không cần load lại web.
+     * 4. UPDATE LOCAL UI (CLIENT-SIDE ONLY)
+     * Updates card data deep within the board state without re-fetching.
+     * Used for real-time updates or seamless UI transitions.
      */
     const updateCardInBoard = (updatedCard) => {
         setBoard(prevBoard => {
@@ -149,7 +147,7 @@ export const useBoard = (boardId) => {
     const moveCardSameCol = async (columnId, newCards) => {
         setBoard(prev => {
             const newBoard = { ...prev };
-            newBoard.columnOrderIds = [...newBoard.columnOrderIds]; // Copy array để React render lại mượt không bị khựng
+            newBoard.columnOrderIds = [...newBoard.columnOrderIds]; // Shallow copy array for smooth re-render
             
             const colIndex = newBoard.columnOrderIds.findIndex(c => c._id === columnId);
             if (colIndex !== -1) {
@@ -249,7 +247,7 @@ export const useBoard = (boardId) => {
     };
 
     /**
-     * 8. CẬP NHẬT THÔNG TIN BẢNG (UPDATE BOARD DETAILS)
+     * 8. UPDATE BOARD DETAILS
      */
     const updateBoardDetails = async (updateData) => {
         try {

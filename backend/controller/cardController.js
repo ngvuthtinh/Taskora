@@ -20,7 +20,7 @@ const createNewCard = async (req, res, next) => {
             { returnDocument: 'after' }
         )
 
-        // Real-time
+        // Real-time notification
         const io = req.app.get('socketio');
         io.to(boardId.toString()).emit('api_update_board', { message: 'Card created' });
 
@@ -52,7 +52,7 @@ const updateCard = async (req, res, next) => {
             throw new Error('Card not found!')
         }
 
-        // Real-time
+        // Real-time notification
         const io = req.app.get('socketio');
         io.to(card.boardId.toString()).emit('api_update_board', { message: 'Card updated' });
 
@@ -101,7 +101,7 @@ const assignMemberToCard = async (req, res, next) => {
             throw new Error('Card not found!')
         }
 
-        // Gửi thông báo nếu là thêm mới người vào card
+        // Send notification for new assignment
         if (action === 'add') {
             await createNotification(
                 targetUserId,
@@ -109,12 +109,12 @@ const assignMemberToCard = async (req, res, next) => {
                 'TASK_ASSIGNMENT',
                 'New Task Assigned',
                 `You have been assigned to the task: "${updatedCard.title}"`,
-                updatedCard.boardId, // relatedId là Board ID
-                updatedCard._id      // cardId là Card ID
+                updatedCard.boardId, // Board ID
+                updatedCard._id      // Card ID
             );
         }
 
-        // Real-time
+        // Real-time notification
         const io = req.app.get('socketio');
         io.to(updatedCard.boardId.toString()).emit('api_update_board', { message: 'Member assignment updated' });
 
@@ -139,7 +139,7 @@ const deleteCard = async (req, res, next) => {
         await Column.findByIdAndUpdate(card.columnId, {
             $pull: { cardOrderIds: cardId }
         })
-        // Real-time
+        // Real-time notification
         const io = req.app.get('socketio');
         io.to(card.boardId.toString()).emit('api_update_board', { message: 'Card deleted' });
 
