@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { loginAPI, registerAPI } from '../services/authService';
+import { loginAPI, registerAPI, googleLoginAPI } from '../services/authService';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
     const [isLoginView, setIsLoginView] = useState(true);
@@ -10,6 +11,18 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const data = await googleLoginAPI(credentialResponse.credential);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            toast.success('Logged in with Google successfully!');
+            navigate('/dashboard');
+        } catch (error) {
+            toast.error('Google login failed!');
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -102,6 +115,20 @@ const LoginPage = () => {
                     >
                         {isLoginView ? 'Sign In' : 'Create Account'}
                     </button>
+
+                    <div className="relative flex items-center py-2">
+                        <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+                        <span className="flex-shrink-0 mx-4 text-slate-400 text-sm">Or continue with</span>
+                        <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+                    </div>
+
+                    <div className="flex justify-center w-full">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => toast.error('Google Login connection failed')}
+                            useOneTap
+                        />
+                    </div>
 
                     <div className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
                         {isLoginView ? (

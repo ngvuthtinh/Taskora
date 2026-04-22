@@ -1,6 +1,9 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 
 const register = async (req, res, next) => {
@@ -74,7 +77,8 @@ const login = async (req, res, next) => {
             user: {
                 _id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                avatar: user.avatar
             }
         })
 
@@ -83,5 +87,63 @@ const login = async (req, res, next) => {
     }
 }
 
+const googleLogin = async (req, res, next) => {
+    try {
+        const { credential } = req.body;
+        
+        // Verify token từ Google
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+        
+        const payload = ticket.getPayload();
+        const { email, name, picture, sub } = payload;
 
-module.exports = { register, login }
+        // Tìm user theo email
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Nếu chưa có thì tạo mới
+            // Password mặc định cho user Google (vì user ko login bằng pass)
+            const salt = await bcrypt.genSalt(10)
+            const hashPassword = await bcrypt.hash(sub + process.env.JWT_SECRET, salt)
+
+            user = await User.create({
+                name: name,
+                email: email,
+                password: hashPassword,
+                avatar: picture
+            });
+        } else if (picture && !user.avatar) {
+            // Cập nhật avatar nếu user đã có tk nhưng chưa có avatar
+            user.avatar = picture;
+            await user.save();
+        }
+
+        // Tạo JWT cho hệ thống của mình
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        )
+
+        res.status(200).json({
+            message: 'Google Login successfully',
+            token: token,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar
+            }
+        })
+
+    } catch (error) {
+        res.status(400)
+        next(new Error('Google login failed! ' + error.message))
+    }
+}
+
+
+module.exports = { register, login, googleLogin }

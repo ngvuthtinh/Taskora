@@ -169,7 +169,11 @@ const Navbar = () => {
                         aria-expanded={dropdownOpen}
                     >
                         <div className="w-8 h-8 rounded-full bg-slate-700 text-white border border-white/20 flex items-center justify-center text-xs font-bold shadow-sm select-none overflow-hidden">
-                            {initials}
+                            {user?.avatar ? (
+                                <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            ) : (
+                                initials
+                            )}
                         </div>
                     </button>
                 </div>
@@ -181,8 +185,12 @@ const Navbar = () => {
                         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Account</p>
                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center text-sm font-bold">
-                                    {initials}
+                                <div className="w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center text-sm font-bold overflow-hidden">
+                                    {user?.avatar ? (
+                                        <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                    ) : (
+                                        initials
+                                    )}
                                 </div>
                                 <div className="flex flex-col overflow-hidden">
                                     <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{user?.name || 'User'}</p>

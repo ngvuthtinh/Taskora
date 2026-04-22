@@ -1,11 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const { register, login } = require('../controller/authController')
+const { register, login, googleLogin } = require('../controller/authController')
 const { protect } = require('../middlewares/authMiddleware'); 
 
 router.post('/register', register)
 
 router.post('/login', login)
+
+router.post('/google-login', googleLogin)
 
 router.get('/me', protect, (req, res) => {
     res.status(200).json({
