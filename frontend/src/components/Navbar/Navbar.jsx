@@ -184,11 +184,11 @@ const Navbar = () => {
         <header className="px-6 py-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 h-12 z-[100] shadow-sm transition-colors duration-300">
             {/* Left: logo & navigation */}
             <div className="flex items-center gap-8">
-                <Link to="/dashboard" className="flex items-center gap-2 text-slate-800 dark:text-white text-lg font-black tracking-tighter hover:opacity-80 transition-opacity">
-                    <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-                       <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.9 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M10,17H8V7H10V17M12,13H10V11H12V13M16,15H14V7H16V15Z"></path></svg>
+                <Link to="/dashboard" className="flex items-center gap-2 group hover:opacity-90 transition-opacity">
+                    <div className="w-7 h-7 rounded bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300">
+                        <img src="/favicon.png" alt="logo" className="w-5 h-5 object-contain" />
                     </div>
-                    Taskora
+                    <span className="text-slate-800 dark:text-white text-lg font-black tracking-tighter">Taskora</span>
                 </Link>
                 
                 <nav className="hidden md:flex items-center gap-1">

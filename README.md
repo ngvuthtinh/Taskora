@@ -2,8 +2,6 @@
 
 Taskora is a high-performance, real-time Kanban board application designed to streamline project management and team collaboration. Inspired by Trello, Taskora combines a sleek, modern interface with powerful background automation and live synchronization.
 
-![Taskora Banner](https://via.placeholder.com/1200x400?text=Taskora+Modern+Kanban+Management)
-
 ## ✨ Key Features
 
 ### 📡 Real-time Collaboration
@@ -94,9 +92,3 @@ Taskora is a high-performance, real-time Kanban board application designed to st
     cd frontend
     npm run dev
     ```
-
-## 📸 Screenshots
-
-| Dashboard | Real-time Board | Task Detail |
-|-----------|-----------------|-------------|
-| ![Dashboard Placeholder](https://via.placeholder.com/300x200?text=Dashboard) | ![Board Placeholder](https://via.placeholder.com/300x200?text=Live+Board) | ![Modal Placeholder](https://via.placeholder.com/300x200?text=Task+Modal) |
