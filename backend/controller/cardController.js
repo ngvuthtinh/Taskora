@@ -20,6 +20,10 @@ const createNewCard = async (req, res, next) => {
             { returnDocument: 'after' }
         )
 
+        // Real-time
+        const io = req.app.get('socketio');
+        io.to(boardId.toString()).emit('api_update_board', { message: 'Card created' });
+
         res.status(201).json({ message: 'Card created successfully!', card: newCard })
     } catch (error) {
         next(error)
@@ -47,6 +51,10 @@ const updateCard = async (req, res, next) => {
             res.status(404)
             throw new Error('Card not found!')
         }
+
+        // Real-time
+        const io = req.app.get('socketio');
+        io.to(card.boardId.toString()).emit('api_update_board', { message: 'Card updated' });
 
         res.status(200).json({ message: 'Card updated successfully!', card: card })
     } catch (error) {
@@ -106,6 +114,10 @@ const assignMemberToCard = async (req, res, next) => {
             );
         }
 
+        // Real-time
+        const io = req.app.get('socketio');
+        io.to(updatedCard.boardId.toString()).emit('api_update_board', { message: 'Member assignment updated' });
+
         res.status(200).json({ message: 'Member updated successfully!', card: updatedCard })
     } catch (error) {
         next(error)
@@ -127,6 +139,10 @@ const deleteCard = async (req, res, next) => {
         await Column.findByIdAndUpdate(card.columnId, {
             $pull: { cardOrderIds: cardId }
         })
+        // Real-time
+        const io = req.app.get('socketio');
+        io.to(card.boardId.toString()).emit('api_update_board', { message: 'Card deleted' });
+
         res.status(200).json({ message: 'Card deleted successfully!' })
     } catch (error) {
         next(error)

@@ -6,15 +6,34 @@ import Column from '../components/Column/Column';
 import { useBoard } from '../hooks/useBoard';
 import Navbar from '../components/Navbar/Navbar';
 import ShareModal from '../components/Board/ShareModal';
+import { socket, joinBoardRoom, leaveBoardRoom } from '../services/socket';
 
 const BoardPage = () => {
     const { id: boardId } = useParams();
     const { 
-        board, createNewCard, createNewColumn, updateCardInBoard, 
+        board, refreshBoard, createNewCard, createNewColumn, updateCardInBoard, 
         moveColumn, moveCardSameCol, moveCardDiffCol,
         deleteCardInBoard, deleteColumnInBoard, deleteBoardInProject,
         updateBoardDetails, inviteMember, removeMember, updateMemberRole
     } = useBoard(boardId);
+
+    // Socket.io Real-time Logic
+    useEffect(() => {
+        if (boardId) {
+            joinBoardRoom(boardId);
+
+            // Lắng nghe sự kiện cập nhật từ Backend
+            socket.on('api_update_board', (data) => {
+                console.log('Real-time sync:', data.message);
+                refreshBoard(); // Tự động load lại dữ liệu
+            });
+
+            return () => {
+                socket.off('api_update_board');
+                leaveBoardRoom(boardId);
+            };
+        }
+    }, [boardId]);
 
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const [newColumnTitle, setNewColumnTitle] = useState('');

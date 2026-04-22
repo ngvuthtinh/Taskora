@@ -18,16 +18,16 @@ export const useBoard = (boardId) => {
      * Nó gọi API fetchBoardDetailsAPI lấy toàn bộ cấu trúc Bảng (Cột, Thẻ)
      * và nhét vào kho lưu trữ (state 'board').
      */
-    useEffect(() => {
-        const loadBoard = async () => {
-            try {
-                const boardData = await fetchBoardDetailsAPI(boardId);
-                setBoard(boardData);
-            } catch (error) {
-                console.error('Error fetching board data:', error);
-            }
-        };
+    const loadBoard = async () => {
+        try {
+            const boardData = await fetchBoardDetailsAPI(boardId);
+            setBoard(boardData);
+        } catch (error) {
+            console.error('Error fetching board data:', error);
+        }
+    };
 
+    useEffect(() => {
         if (boardId) {
             loadBoard();
         }
@@ -319,6 +319,7 @@ export const useBoard = (boardId) => {
     // Only expose what is needed
     return { 
         board, 
+        refreshBoard: loadBoard,
         createNewCard, 
         createNewColumn, 
         updateCardInBoard,

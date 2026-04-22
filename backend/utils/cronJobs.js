@@ -5,7 +5,7 @@ const { createNotification } = require('./notificationHelper');
 const initCronJobs = () => {
     // Chạy mỗi phút (để bạn dễ kiểm tra tính năng)
     // Cấu trúc: giây phút giờ ngày tháng thứ_trong_tuần
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('0 * * * *', async () => {
         console.log('--- Checking for upcoming deadlines... ---');
         
         try {

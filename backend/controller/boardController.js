@@ -85,13 +85,17 @@ const getBoardDetails = async (req, res, next) => {
 
 const moveCardToDifferentColumn = async (req, res, next) => {
     try {
-        const { cardId, prevColumnId, prevCardOrderIds, nextColumnId, nextCardOrderIds } = req.body
+        const { boardId, cardId, prevColumnId, prevCardOrderIds, nextColumnId, nextCardOrderIds } = req.body
 
         const updatePrevColumn = Column.findByIdAndUpdate(prevColumnId, { cardOrderIds: prevCardOrderIds }, { returnDocument: 'after' })
         const updateNextColumn = Column.findByIdAndUpdate(nextColumnId, { cardOrderIds: nextCardOrderIds }, { returnDocument: 'after' })
         const updateCard = Card.findByIdAndUpdate(cardId, { columnId: nextColumnId }, { returnDocument: 'after' })
 
         await Promise.all([updatePrevColumn, updateNextColumn, updateCard])
+
+        // Phát tín hiệu Real-time cho mọi người trong Board
+        const io = req.app.get('socketio');
+        io.to(boardId).emit('api_update_board', { message: 'Card moved!' });
 
         res.status(200).json({ message: 'Card moved successfully!' })
     } catch (error) {
@@ -122,6 +126,10 @@ const updateBoard = async (req, res, next) => {
         }
 
         res.status(200).json({ message: 'Board updated successfully!', board: updatedBoard })
+        
+        // Real-time: Thông báo bảng đã cập nhật
+        const io = req.app.get('socketio');
+        io.to(boardId).emit('api_update_board', { message: 'Board layout changed!' });
     } catch (error) {
         next(error)
     }

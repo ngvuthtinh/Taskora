@@ -35,7 +35,5 @@ Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Cl
 
 ## 🚀 [BONUS] Cấp độ "Săn Intern" (Advanced Features)
 - [ ] **Real-time Sync (Socket.io)**: Đồng bộ hoạt động Board ngay lập tức (Kéo thả, sửa card...).
-- [ ] **Attachments**: Cho phép đính kèm file/hình ảnh vào Card.
-
 ---
 **Ghi chú:** Khi hoàn thành, hãy đổi `[ ]` thành `[x]` để tick xanh nhiệm vụ.

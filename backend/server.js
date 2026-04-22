@@ -12,7 +12,20 @@ const { errorHandler } = require('./middlewares/errorMiddleware')
 const { initCronJobs } = require('./utils/cronJobs')
 
 
+const http = require('http');
+const { Server } = require('socket.io');
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT']
+  }
+});
+
+// Gán io vào app để có thể dùng ở các controller khác
+app.set('socketio', io);
 
 // Connect DB
 connectDB();
@@ -38,7 +51,28 @@ app.use('/api/notifications', notificationRoutes)
 
 app.use(errorHandler);
 
+// Socket.io Logic
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    // Người dùng tham gia vào phòng của một Board cụ thể
+    socket.on('joinBoard', (boardId) => {
+        socket.join(boardId);
+        console.log(`User ${socket.id} joined board: ${boardId}`);
+    });
+
+    // Người dùng rời khỏi phòng
+    socket.on('leaveBoard', (boardId) => {
+        socket.leave(boardId);
+        console.log(`User ${socket.id} left board: ${boardId}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
 const PORT = process.env.PORT || 8000
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
 })
