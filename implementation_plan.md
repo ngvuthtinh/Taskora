@@ -33,7 +33,7 @@ Dự án Taskora - Ứng dụng quản lý công việc dạng Kanban (Trello Cl
 ## 🏗️ Sprint 4: Cá nhân hóa tài khoản (User Settings)
 *Trạng thái: Đang thực hiện*
 - [x] Đổi mật khẩu/Thông tin: Chỉnh sửa tên hiển thị và bảo mật tài khoản.
-- [ ] Ảnh đại diện (Profile Picture): Upload và thay đổi ảnh cá nhân (Cloudinary).
+- [x] Ảnh đại diện (Profile Picture): Upload và thay đổi ảnh cá nhân (Cloudinary).
 - [x] Dark Mode (Giao diện tối): Tích hợp Theme switcher cho hệ thống.
 
 ## 🚀 [BONUS] Cấp độ "Săn Intern" (Advanced Features)

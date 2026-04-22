@@ -59,5 +59,31 @@ const updatePassword = async (req, res, next) => {
     }
 }
 
-module.exports = { updateProfile, updatePassword }
+const updateAvatar = async (req, res, next) => {
+    try {
+        if (!req.file) {
+            res.status(400);
+            throw new Error('No file uploaded!');
+        }
+
+        const userId = req.user._id;
+        // Kiểm tra link ảnh từ Cloudinary (v2 thường dùng .url hoặc .secure_url)
+        const avatarUrl = req.file.path || req.file.url || req.file.secure_url;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { avatar: avatarUrl },
+            { returnDocument: 'after' }
+        ).select('-password');
+
+        res.status(200).json({
+            message: 'Avatar updated successfully!',
+            user: updatedUser
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { updateProfile, updatePassword, updateAvatar }
 

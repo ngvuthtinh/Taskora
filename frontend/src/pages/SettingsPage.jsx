@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Navbar from '../components/Navbar/Navbar';
 import { toast } from 'react-toastify';
-import { updateProfileAPI, updatePasswordAPI } from '../services/userService';
+import { updateProfileAPI, updatePasswordAPI, updateAvatarAPI } from '../services/userService';
 
 const SettingsPage = () => {
     const [activeTab, setActiveTab] = useState('profile');
@@ -22,6 +22,40 @@ const SettingsPage = () => {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const fileInputRef = useRef(null);
+
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Giới hạn kích thước 800KB như UI đã thông báo
+        if (file.size > 800 * 1024) {
+            return toast.error('File is too large! Max size 800KB');
+        }
+
+        try {
+            setIsUpdating(true);
+            const formData = new FormData();
+            formData.append('avatar', file); // 'avatar' phải trùng với backend (upload.single('avatar'))
+
+            const data = await updateAvatarAPI(formData);
+            
+            // Cập nhật lại thông tin user trong local
+            const updatedUser = { ...user, avatar: data.user.avatar };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+
+            // Thông báo cho Navbar biết để đổi ảnh ngay lập tức
+            window.dispatchEvent(new Event("userUpdated")); 
+            
+            toast.success('Avatar updated successfully!');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to upload avatar');
+        } finally {
+            setIsUpdating(false);
+            e.target.value = null; // Reset input để có thể chọn lại cùng 1 file
+        }
+    };
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
@@ -115,12 +149,28 @@ const SettingsPage = () => {
                                 <form onSubmit={handleUpdateProfile} className="space-y-8">
                                     {/* Avatar Upload */}
                                     <div className="flex items-center gap-6 pb-8 border-b border-slate-100 dark:border-slate-800">
-                                        <div className="w-20 h-20 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center text-2xl font-bold shadow-lg border-4 border-white dark:border-slate-900">
-                                            {initials}
+                                        <div className="w-20 h-20 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center text-2xl font-bold shadow-lg border-4 border-white dark:border-slate-900 overflow-hidden">
+                                            {user?.avatar ? (
+                                                <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                            ) : (
+                                                initials
+                                            )}
                                         </div>
                                         <div>
-                                            <button type="button" className="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-xl text-sm font-bold hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all mb-1">
-                                                Change Avatar
+                                            <input 
+                                                type="file" 
+                                                ref={fileInputRef} 
+                                                onChange={handleAvatarChange} 
+                                                className="hidden" 
+                                                accept="image/*"
+                                            />
+                                            <button 
+                                                type="button" 
+                                                onClick={() => fileInputRef.current.click()}
+                                                disabled={isUpdating}
+                                                className="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-xl text-sm font-bold hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all mb-1 disabled:opacity-50"
+                                            >
+                                                {isUpdating ? 'Uploading...' : 'Change Avatar'}
                                             </button>
                                             <p className="text-[11px] text-slate-400 dark:text-slate-500">JPG, GIF or PNG. Max size of 800K</p>
                                         </div>
